@@ -3,6 +3,7 @@ import ToggleButton from "./ToggleButton";
 import { DarkModeContext } from "./DarkModeProvider";
 import Iridescence from '../assets/iridescence';
 import RotatingText from '../assets/RotatingText';
+import TechIcon from '../assets/TechIcon';
 
 export default function Portfolio() {
     const { darkMode } = useContext(DarkModeContext);
@@ -741,247 +742,317 @@ export default function Portfolio() {
                         color: darkMode ? "#F9F8F6" : "#000"
                     }}>Technologies & Tools</p>
                     
-                    {/* Main technologies grid */}
-                    <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                        {/* Frontend Development */}
-                        <div className="tech-category bg-gradient-to-br from-[#6c72cb]/5 to-[#cb69c1]/5 backdrop-blur-sm p-8 rounded-2xl border border-[#6c72cb]/20 hover:border-[#6c72cb]/30 transition-all duration-300 group">
-                            <div className="flex items-center mb-6">
-                                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#6c72cb] to-[#cb69c1] flex items-center justify-center shadow-lg shadow-purple-500/20">
+                    {/* Main technologies grid - Replaced with animated icons */}
+                    <div className="w-full grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+                        {/* Programming Languages */}
+                        <div className="tech-category col-span-2 md:col-span-3 lg:col-span-4 mb-8">
+                            <h3 className="text-2xl font-semibold mb-6 flex items-center" style={{
+                                color: darkMode ? "#F9F8F6" : "#000"
+                            }}>
+                                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#4CAF50] to-[#8BC34A] flex items-center justify-center shadow-lg shadow-green-500/20 mr-3">
                                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M4 5H20V19H4V5Z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                        <path d="M4 9H20" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                        <path d="M8 5V9" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                        <path d="M8 3L3 8L8 13" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                        <path d="M16 3L21 8L16 13" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                        <path d="M3 8H21" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                        <path d="M3 17H21" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                        <path d="M8 21L12 13L16 21" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                                     </svg>
                                 </div>
-                                <h3 className="text-2xl font-semibold ml-4" style={{
-                                    color: darkMode ? "#F9F8F6" : "#000"
-                                }}>Frontend</h3>
-                            </div>
+                                Programming Languages
+                            </h3>
                             
-                            <div className="space-y-4">
-                                {/* Individual tech items with progress indicators */}
-                                <div className="tech-item">
-                                    <div className="flex justify-between mb-1">
-                                        <span className="font-medium" style={{
-                                            color: darkMode ? "#F9F8F6" : "#000"
-                                        }}>React</span>
-                                        <span className="text-sm opacity-70" style={{
-                                            color: darkMode ? "#F9F8F6" : "#000"
-                                        }}>Expert</span>
-                                    </div>
-                                    <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-                                        <div className="h-full bg-gradient-to-r from-[#6c72cb] to-[#cb69c1] w-[95%] rounded-full"></div>
+                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
+                                <TechIcon 
+                                    name="Java" 
+                                    color={darkMode ? "#f89820" : "#5382a1"} 
+                                    className="transform hover:-translate-y-2 transition-transform duration-300"
+                                />
+                                <TechIcon 
+                                    name="Python" 
+                                    color={darkMode ? "#4B8BBE" : "#306998"} 
+                                    className="transform hover:-translate-y-2 transition-transform duration-300"
+                                />
+                                <TechIcon 
+                                    name="C#" 
+                                    color={darkMode ? "#9B4F96" : "#68217A"} 
+                                    className="transform hover:-translate-y-2 transition-transform duration-300"
+                                />
+                                <TechIcon 
+                                    name="C++" 
+                                    color={darkMode ? "#649AD2" : "#044F88"} 
+                                    className="transform hover:-translate-y-2 transition-transform duration-300"
+                                />
+                                <TechIcon 
+                                    name="JavaScript" 
+                                    color={darkMode ? "#F7DF1E" : "#F0DB4F"} 
+                                    className="transform hover:-translate-y-2 transition-transform duration-300"
+                                />
+                                <TechIcon 
+                                    name="TypeScript" 
+                                    color={darkMode ? "#3178C6" : "#2F74C0"} 
+                                    className="transform hover:-translate-y-2 transition-transform duration-300"
+                                />
+                                <TechIcon 
+                                    name="PHP" 
+                                    color={darkMode ? "#8993be" : "#474A8A"} 
+                                    className="transform hover:-translate-y-2 transition-transform duration-300"
+                                />
+                                
                                     </div>
                                 </div>
                                 
-                                <div className="tech-item">
-                                    <div className="flex justify-between mb-1">
-                                        <span className="font-medium" style={{
+                        {/* Libraries and Frameworks */}
+                        <div className="tech-category col-span-2 md:col-span-3 lg:col-span-4 mb-8">
+                            <h3 className="text-2xl font-semibold mb-6 flex items-center" style={{
                                             color: darkMode ? "#F9F8F6" : "#000"
-                                        }}>Tailwind CSS</span>
-                                        <span className="text-sm opacity-70" style={{
-                                            color: darkMode ? "#F9F8F6" : "#000"
-                                        }}>Expert</span>
-                                    </div>
-                                    <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-                                        <div className="h-full bg-gradient-to-r from-[#6c72cb] to-[#cb69c1] w-[90%] rounded-full"></div>
-                                    </div>
+                            }}>
+                                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#9C27B0] to-[#673AB7] flex items-center justify-center shadow-lg shadow-purple-500/20 mr-3">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M12 3L21 8V16L12 21L3 16V8L12 3Z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                        <path d="M16.5 10.5L7.5 15.5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                        <path d="M7.5 8.5L16.5 13.5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                        <path d="M12 3V21" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                    </svg>
                                 </div>
-                                
-                                <div className="tech-item">
-                                    <div className="flex justify-between mb-1">
-                                        <span className="font-medium" style={{
-                                            color: darkMode ? "#F9F8F6" : "#000"
-                                        }}>JavaScript/TypeScript</span>
-                                        <span className="text-sm opacity-70" style={{
-                                            color: darkMode ? "#F9F8F6" : "#000"
-                                        }}>Expert</span>
+                                Libraries & Frameworks
+                            </h3>
+                            
+                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
+                                <TechIcon 
+                                    name="Spring" 
+                                    color={darkMode ? "#6DB33F" : "#6DB33F"} 
+                                    className="transform hover:-translate-y-2 transition-transform duration-300"
+                                />
+                                <div 
+                                    className="tech-icon flex flex-col items-center justify-center transform hover:-translate-y-2 transition-transform duration-300"
+                                    onMouseEnter={(e) => e.currentTarget.querySelector('img').classList.add('scale-110')}
+                                    onMouseLeave={(e) => e.currentTarget.querySelector('img').classList.remove('scale-110')}
+                                >
+                                    <div className="relative flex items-center justify-center rounded-full overflow-hidden transition-all duration-300 ease-in-out" style={{ width: "50px", height: "50px" }}>
+                                        <img 
+                                            src="/tech-stack/spring-boot.svg" 
+                                            alt="Spring Boot" 
+                                            className="w-[35px] h-[35px] transition-all duration-300 animate-fadeIn"
+                                        />
                                     </div>
-                                    <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-                                        <div className="h-full bg-gradient-to-r from-[#6c72cb] to-[#cb69c1] w-[92%] rounded-full"></div>
-                                    </div>
+                                    <span className="mt-2 text-sm font-medium opacity-70 transition-all duration-300" style={{ color: darkMode ? "#6DB33F" : "#6DB33F" }}>
+                                        Spring Boot
+                                    </span>
                                 </div>
-                                
-                                <div className="tech-item">
-                                    <div className="flex justify-between mb-1">
-                                        <span className="font-medium" style={{
-                                            color: darkMode ? "#F9F8F6" : "#000"
-                                        }}>Next.js</span>
-                                        <span className="text-sm opacity-70" style={{
-                                            color: darkMode ? "#F9F8F6" : "#000"
-                                        }}>Advanced</span>
+                                <TechIcon 
+                                    name="Flask" 
+                                    color={darkMode ? "#FFFFFF" : "#000000"} 
+                                    className="transform hover:-translate-y-2 transition-transform duration-300"
+                                />
+                                <div 
+                                    className="tech-icon flex flex-col items-center justify-center transform hover:-translate-y-2 transition-transform duration-300"
+                                    onMouseEnter={(e) => e.currentTarget.querySelector('img').classList.add('scale-110')}
+                                    onMouseLeave={(e) => e.currentTarget.querySelector('img').classList.remove('scale-110')}
+                                >
+                                    <div className="relative flex items-center justify-center rounded-full overflow-hidden transition-all duration-300 ease-in-out" style={{ width: "50px", height: "50px" }}>
+                                        <img 
+                                            src="/tech-stack/dotnet.svg" 
+                                            alt=".NET" 
+                                            className="w-[35px] h-[35px] transition-all duration-300 animate-fadeIn"
+                                        />
                                     </div>
-                                    <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-                                        <div className="h-full bg-gradient-to-r from-[#6c72cb] to-[#cb69c1] w-[85%] rounded-full"></div>
+                                    <span className="mt-2 text-sm font-medium opacity-70 transition-all duration-300" style={{ color: darkMode ? "#512BD4" : "#5C2D91" }}>
+                                        .NET
+                                    </span>
+                                </div>
+                                <TechIcon 
+                                    name="React" 
+                                    color={darkMode ? "#61DAFB" : "#149ECA"} 
+                                    className="transform hover:-translate-y-2 transition-transform duration-300"
+                                />
+                                <div 
+                                    className="tech-icon flex flex-col items-center justify-center transform hover:-translate-y-2 transition-transform duration-300"
+                                    onMouseEnter={(e) => e.currentTarget.querySelector('img').classList.add('scale-110')}
+                                    onMouseLeave={(e) => e.currentTarget.querySelector('img').classList.remove('scale-110')}
+                                >
+                                    <div className="relative flex items-center justify-center rounded-full overflow-hidden transition-all duration-300 ease-in-out" style={{ width: "50px", height: "50px" }}>
+                                        <img 
+                                            src="/tech-stack/react-native.svg" 
+                                            alt="React Native" 
+                                            className="w-[35px] h-[35px] transition-all duration-300 animate-fadeIn"
+                                        />
                                     </div>
+                                    <span className="mt-2 text-sm font-medium opacity-70 transition-all duration-300" style={{ color: darkMode ? "#61DAFB" : "#149ECA" }}>
+                                        React Native
+                                    </span>
+                                </div>
+                                <TechIcon 
+                                    name="NextJS" 
+                                    color={darkMode ? "#FFFFFF" : "#000000"} 
+                                    className="transform hover:-translate-y-2 transition-transform duration-300"
+                                />
+                                <TechIcon 
+                                    name="Laravel" 
+                                    color={darkMode ? "#FF2D20" : "#FF2D20"} 
+                                    className="transform hover:-translate-y-2 transition-transform duration-300"
+                                />
+                                <div 
+                                    className="tech-icon flex flex-col items-center justify-center transform hover:-translate-y-2 transition-transform duration-300"
+                                    onMouseEnter={(e) => e.currentTarget.querySelector('img').classList.add('scale-110')}
+                                    onMouseLeave={(e) => e.currentTarget.querySelector('img').classList.remove('scale-110')}
+                                >
+                                    <div className="relative flex items-center justify-center rounded-full overflow-hidden transition-all duration-300 ease-in-out" style={{ width: "50px", height: "50px" }}>
+                                        <img 
+                                            src="/tech-stack/kafka.svg" 
+                                            alt="Kafka" 
+                                            className="w-[35px] h-[35px] transition-all duration-300 animate-fadeIn"
+                                        />
+                                    </div>
+                                    <span className="mt-2 text-sm font-medium opacity-70 transition-all duration-300" style={{ color: darkMode ? "#231F20" : "#231F20" }}>
+                                        Kafka
+                                    </span>
                                 </div>
                             </div>
                         </div>
-                        
-                        {/* Backend Development */}
-                        <div className="tech-category bg-gradient-to-br from-[#00bcd4]/5 to-[#3f51b5]/5 backdrop-blur-sm p-8 rounded-2xl border border-[#00bcd4]/20 hover:border-[#00bcd4]/30 transition-all duration-300 group">
-                            <div className="flex items-center mb-6">
-                                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#00bcd4] to-[#3f51b5] flex items-center justify-center shadow-lg shadow-blue-500/20">
+                                
+                        {/* Databases */}
+                        <div className="tech-category col-span-2 md:col-span-3 lg:col-span-4 mb-8">
+                            <h3 className="text-2xl font-semibold mb-6 flex items-center" style={{
+                                            color: darkMode ? "#F9F8F6" : "#000"
+                            }}>
+                                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#2196F3] to-[#03A9F4] flex items-center justify-center shadow-lg shadow-blue-500/20 mr-3">
                                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M5 12H19" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                        <path d="M12 5L12 19" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                        <path d="M4 5H20V7H4V5Z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                        <path d="M4 17H20V19H4V17Z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                        <path d="M12 5C16.4183 5 20 4.32843 20 3.5C20 2.67157 16.4183 2 12 2C7.58172 2 4 2.67157 4 3.5C4 4.32843 7.58172 5 12 5Z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                        <path d="M20 3.5V20.5C20 21.3284 16.4183 22 12 22C7.58172 22 4 21.3284 4 20.5V3.5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                        <path d="M20 12C20 12.8284 16.4183 13.5 12 13.5C7.58172 13.5 4 12.8284 4 12" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                        <path d="M20 16.5C20 17.3284 16.4183 18 12 18C7.58172 18 4 17.3284 4 16.5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                        <path d="M20 7.5C20 8.32843 16.4183 9 12 9C7.58172 9 4 8.32843 4 7.5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                                     </svg>
                                 </div>
-                                <h3 className="text-2xl font-semibold ml-4" style={{
-                                    color: darkMode ? "#F9F8F6" : "#000"
-                                }}>Backend</h3>
-                            </div>
+                                Databases
+                            </h3>
                             
-                            <div className="space-y-4">
-                                <div className="tech-item">
-                                    <div className="flex justify-between mb-1">
-                                        <span className="font-medium" style={{
-                                            color: darkMode ? "#F9F8F6" : "#000"
-                                        }}>Node.js</span>
-                                        <span className="text-sm opacity-70" style={{
-                                            color: darkMode ? "#F9F8F6" : "#000"
-                                        }}>Expert</span>
+                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
+                                <TechIcon 
+                                    name="PostgreSQL" 
+                                    color={darkMode ? "#336791" : "#0064a5"} 
+                                    className="transform hover:-translate-y-2 transition-transform duration-300"
+                                />
+                                <TechIcon 
+                                    name="MySQL" 
+                                    color={darkMode ? "#005571" : "#005571"} 
+                                    className="transform hover:-translate-y-2 transition-transform duration-300"
+                                />
+                                <TechIcon 
+                                    name="MongoDB" 
+                                    color={darkMode ? "#47A248" : "#13AA52"} 
+                                    className="transform hover:-translate-y-2 transition-transform duration-300"
+                                />
+                                <TechIcon 
+                                    name="Firebase" 
+                                    color={darkMode ? "#FFCA28" : "#FFA000"} 
+                                    className="transform hover:-translate-y-2 transition-transform duration-300"
+                                />
+                                <TechIcon 
+                                    name="Oracle" 
+                                    color={darkMode ? "#F80000" : "#F80000"} 
+                                    className="transform hover:-translate-y-2 transition-transform duration-300"
+                                />
+                                <TechIcon 
+                                    name="Elasticsearch" 
+                                    color={darkMode ? "#005571" : "#005571"} 
+                                    className="transform hover:-translate-y-2 transition-transform duration-300"
+                                />
                                     </div>
-                                    <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-                                        <div className="h-full bg-gradient-to-r from-[#00bcd4] to-[#3f51b5] w-[93%] rounded-full"></div>
-                                    </div>
-                                </div>
-                                
-                                <div className="tech-item">
-                                    <div className="flex justify-between mb-1">
-                                        <span className="font-medium" style={{
-                                            color: darkMode ? "#F9F8F6" : "#000"
-                                        }}>Express.js</span>
-                                        <span className="text-sm opacity-70" style={{
-                                            color: darkMode ? "#F9F8F6" : "#000"
-                                        }}>Expert</span>
-                                    </div>
-                                    <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-                                        <div className="h-full bg-gradient-to-r from-[#00bcd4] to-[#3f51b5] w-[90%] rounded-full"></div>
-                                    </div>
-                                </div>
-                                
-                                <div className="tech-item">
-                                    <div className="flex justify-between mb-1">
-                                        <span className="font-medium" style={{
-                                            color: darkMode ? "#F9F8F6" : "#000"
-                                        }}>MongoDB</span>
-                                        <span className="text-sm opacity-70" style={{
-                                            color: darkMode ? "#F9F8F6" : "#000"
-                                        }}>Advanced</span>
-                                    </div>
-                                    <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-                                        <div className="h-full bg-gradient-to-r from-[#00bcd4] to-[#3f51b5] w-[85%] rounded-full"></div>
                                     </div>
                                 </div>
                                 
-                                <div className="tech-item">
-                                    <div className="flex justify-between mb-1">
-                                        <span className="font-medium" style={{
-                                            color: darkMode ? "#F9F8F6" : "#000"
-                                        }}>SQL/PostgreSQL</span>
-                                        <span className="text-sm opacity-70" style={{
-                                            color: darkMode ? "#F9F8F6" : "#000"
-                                        }}>Advanced</span>
-                                    </div>
-                                    <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-                                        <div className="h-full bg-gradient-to-r from-[#00bcd4] to-[#3f51b5] w-[80%] rounded-full"></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        {/* UI/UX Design */}
-                        <div className="tech-category bg-gradient-to-br from-[#ff5722]/5 to-[#ff9800]/5 backdrop-blur-sm p-8 rounded-2xl border border-[#ff5722]/20 hover:border-[#ff5722]/30 transition-all duration-300 group">
-                            <div className="flex items-center mb-6">
-                                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#ff5722] to-[#ff9800] flex items-center justify-center shadow-lg shadow-orange-500/20">
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M6 3C4.34315 3 3 4.34315 3 6V18C3 19.6569 4.34315 21 6 21H18C19.6569 21 21 19.6569 21 18V6C21 4.34315 19.6569 3 18 3H6Z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                        <path d="M12 8V16" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                        <path d="M8 12H16" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                    </svg>
-                                </div>
-                                <h3 className="text-2xl font-semibold ml-4" style={{
-                                    color: darkMode ? "#F9F8F6" : "#000"
-                                }}>UI/UX Design</h3>
-                            </div>
-                            
-                            <div className="space-y-4">
-                                <div className="tech-item">
-                                    <div className="flex justify-between mb-1">
-                                        <span className="font-medium" style={{
-                                            color: darkMode ? "#F9F8F6" : "#000"
-                                        }}>Figma</span>
-                                        <span className="text-sm opacity-70" style={{
-                                            color: darkMode ? "#F9F8F6" : "#000"
-                                        }}>Expert</span>
-                                    </div>
-                                    <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-                                        <div className="h-full bg-gradient-to-r from-[#ff5722] to-[#ff9800] w-[95%] rounded-full"></div>
-                                    </div>
-                                </div>
-                                
-                                <div className="tech-item">
-                                    <div className="flex justify-between mb-1">
-                                        <span className="font-medium" style={{
-                                            color: darkMode ? "#F9F8F6" : "#000"
-                                        }}>Adobe XD</span>
-                                        <span className="text-sm opacity-70" style={{
-                                            color: darkMode ? "#F9F8F6" : "#000"
-                                        }}>Advanced</span>
-                                    </div>
-                                    <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-                                        <div className="h-full bg-gradient-to-r from-[#ff5722] to-[#ff9800] w-[85%] rounded-full"></div>
-                                    </div>
-                                </div>
-                                
-                                <div className="tech-item">
-                                    <div className="flex justify-between mb-1">
-                                        <span className="font-medium" style={{
-                                            color: darkMode ? "#F9F8F6" : "#000"
-                                        }}>Responsive Design</span>
-                                        <span className="text-sm opacity-70" style={{
-                                            color: darkMode ? "#F9F8F6" : "#000"
-                                        }}>Expert</span>
-                                    </div>
-                                    <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-                                        <div className="h-full bg-gradient-to-r from-[#ff5722] to-[#ff9800] w-[90%] rounded-full"></div>
-                                    </div>
-                                </div>
-                                
-                                <div className="tech-item">
-                                    <div className="flex justify-between mb-1">
-                                        <span className="font-medium" style={{
-                                            color: darkMode ? "#F9F8F6" : "#000"
-                                        }}>Prototyping</span>
-                                        <span className="text-sm opacity-70" style={{
-                                            color: darkMode ? "#F9F8F6" : "#000"
-                                        }}>Expert</span>
-                                    </div>
-                                    <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-                                        <div className="h-full bg-gradient-to-r from-[#ff5722] to-[#ff9800] w-[92%] rounded-full"></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    {/* Tools tag cloud */}
-                    <div className="mt-16 w-full">
-                        <h3 className="text-2xl font-semibold mb-8 text-center" style={{
+                    {/* Tools tag cloud - Keep this section but enhance it */}
+                    <div className="mt-8 w-full">
+                        <h3 className="text-2xl font-semibold mb-6 flex items-center" style={{
                             color: darkMode ? "#F9F8F6" : "#000"
-                        }}>Other Tools & Technologies</h3>
+                        }}>
+                            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#9C27B0] to-[#673AB7] flex items-center justify-center shadow-lg shadow-purple-500/20 mr-3">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 4C10.3431 4 9 5.34315 9 7C9 8.65685 10.3431 10 12 10C13.6569 10 15 8.65685 15 7C15 5.34315 13.6569 4 12 4Z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                    <path d="M4 12C4 10.3431 5.34315 9 7 9H17C18.6569 9 20 10.3431 20 12V20C20 21.6569 18.6569 23 17 23H7C5.34315 23 4 21.6569 4 20V12Z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                </svg>
+                            </div>
+                            DevOps & Cloud Services
+                        </h3>
+                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
+                        <TechIcon 
+                            name="git" 
+                            color={darkMode ? "#F05032" : "#F05032"} 
+                            className="transform hover:-translate-y-2 transition-transform duration-300"
+                        />
+                        <TechIcon 
+                            name="docker" 
+                            color={darkMode ? "#4285F4" : "#4285F4"} 
+                            className="transform hover:-translate-y-2 transition-transform duration-300"
+                        />
+                        <TechIcon 
+                            name="kubernetes" 
+                            color={darkMode ? "#326CE5" : "#326CE5"} 
+                            className="transform hover:-translate-y-2 transition-transform duration-300"
+                        />
+                        <TechIcon 
+                            name="terraform" 
+                            color={darkMode ? "#623CE4" : "#623CE4"} 
+                            className="transform hover:-translate-y-2 transition-transform duration-300"
+                        />
+                        <TechIcon 
+                            name="jenkins" 
+                            color={darkMode ? "#D24939" : "#D24939"} 
+                            className="transform hover:-translate-y-2 transition-transform duration-300"
+                        />
+                        <TechIcon 
+                            name="github actions" 
+                            color={darkMode ? "#2088FF" : "#2088FF"} 
+                            className="transform hover:-translate-y-2 transition-transform duration-300"
+                        />
+                        <TechIcon 
+                            name="apache" 
+                            color={darkMode ? "#343434" : "#343434"} 
+                            className="transform hover:-translate-y-2 transition-transform duration-300"
+                        />
+                        <TechIcon 
+                            name="tomcat" 
+                            color={darkMode ? "#FF9900" : "#FF9900"} 
+                            className="transform hover:-translate-y-2 transition-transform duration-300"
+                        />
+                        <TechIcon 
+                            name="nginx" 
+                            color={darkMode ? "#009639" : "#009639"} 
+                            className="transform hover:-translate-y-2 transition-transform duration-300"
+                        />
+                        <TechIcon 
+                            name="graphql" 
+                            color={darkMode ? "#E10098" : "#E10098"} 
+                            className="transform hover:-translate-y-2 transition-transform duration-300"
+                        />
+                        <TechIcon 
+                            name="AWS" 
+                            color={darkMode ? "#FF9900" : "#FF9900"} 
+                            className="transform hover:-translate-y-2 transition-transform duration-300"
+                        />
+                        
+                        </div>
+                        
+                        <h3 className="text-xl font-semibold mb-6 text-center" style={{
+                            color: darkMode ? "#F9F8F6" : "#000"
+                        }}>Other Technologies</h3>
                         
                         <div className="flex flex-wrap justify-center gap-3">
                             {["Git", "GitHub", "Docker", "AWS", "Vercel", "Jest", "Testing Library", "Redux", "Zustand", "Framer Motion", 
                               "GraphQL", "Firebase", "Webpack", "Vite", "SCSS", "Storybook", "CI/CD", "Accessibility", "SEO", "Performance Optimization"]
                               .map((tool, index) => (
-                                <div key={index} className="px-4 py-2 bg-gradient-to-r from-[#6c72cb]/10 to-[#cb69c1]/10 rounded-full border border-[#6c72cb]/20 
-                                    hover:border-[#6c72cb]/30 hover:scale-105 transition-all duration-300 cursor-default" style={{
-                                    color: darkMode ? "#F9F8F6" : "#000"
-                                }}>
+                                <div key={index} 
+                                    className="px-4 py-2 rounded-full border 
+                                    transform hover:scale-110 hover:-translate-y-1 
+                                    transition-all duration-300 cursor-default
+                                    hover:shadow-md hover:bg-opacity-20 backdrop-blur-sm"
+                                    style={{
+                                        color: darkMode ? "#F9F8F6" : "#000",
+                                        backgroundColor: `rgba(${108 + index % 50}, ${114 + index % 30}, ${203 - index % 40}, 0.1)`,
+                                        borderColor: `rgba(${108 + index % 50}, ${114 + index % 30}, ${203 - index % 40}, 0.3)`
+                                    }}
+                                >
                                     {tool}
                                 </div>
                             ))}
