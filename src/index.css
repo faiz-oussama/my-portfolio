@@ -89,3 +89,40 @@
 .tech-icon:hover {
   filter: drop-shadow(0 0 8px rgba(108, 114, 203, 0.5));
 }
+
+@keyframes gradient-x {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+.animate-gradient-x {
+  background-size: 200% 200%;
+  animation: gradient-x 15s ease infinite;
+}
+@keyframes spin-slow {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+.animate-spin-slow {
+  animation: spin-slow 12s linear infinite;
+}
+@keyframes bounce-slow {
+  0%, 100% { transform: translateY(0) rotate(45deg); }
+  50% { transform: translateY(-10px) rotate(45deg); }
+}
+.animate-bounce-slow {
+  animation: bounce-slow 6s ease-in-out infinite;
+}
+.bg-grid {
+  background-image: linear-gradient(to right, rgba(255, 255, 255, 0.1) 1px, transparent 1px),
+                    linear-gradient(to bottom, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+@keyframes pulse-wave {
+  0% { transform: scale(0.95); opacity: 1; }
+  50% { transform: scale(1.05); opacity: 0.8; }
+  100% { transform: scale(0.95); opacity: 1; }
+}
+.animate-pulse-wave {
+  animation: pulse-wave 4s ease-in-out infinite;
+}

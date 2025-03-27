@@ -1,9 +1,9 @@
+import { motion } from 'framer-motion';
 import React, { useContext, useEffect, useRef, useState } from "react";
-import ToggleButton from "./ToggleButton";
-import { DarkModeContext } from "./DarkModeProvider";
 import Iridescence from '../assets/iridescence';
 import RotatingText from '../assets/RotatingText';
 import TechIcon from '../assets/TechIcon';
+import { DarkModeContext } from "./DarkModeProvider";
 
 export default function Portfolio() {
     const { darkMode } = useContext(DarkModeContext);
@@ -47,212 +47,8 @@ export default function Portfolio() {
             title: "Best practices for modern web development."
         }
     ];
-    
-    // Slider drag functionality
-    const [isDragging, setIsDragging] = useState(false);
-    const [startX, setStartX] = useState(0);
-    const [startY, setStartY] = useState(0);
-    const [translateX, setTranslateX] = useState(0);
-    const circleSliderRef = useRef(null);
-    const blogSliderRef = useRef(null);
-    
-    // Auto-rotate sliders with pause during interaction
-    useEffect(() => {
-        if (isDragging) return;
-        
-        const statInterval = setInterval(() => {
-            setCurrentStatIndex((prev) => (prev + 1) % stats.length);
-        }, 4000);
-        
-        const blogInterval = setInterval(() => {
-            setCurrentBlogIndex((prev) => (prev + 1) % blogPosts.length);
-        }, 5000);
-        
-        return () => {
-            clearInterval(statInterval);
-            clearInterval(blogInterval);
-        };
-    }, [isDragging, stats.length, blogPosts.length]);
-    
-    // Slider navigation functions
-    const nextStat = () => {
-        setCurrentStatIndex((prev) => (prev + 1) % stats.length);
-    };
-    
-    const prevStat = () => {
-        setCurrentStatIndex((prev) => (prev - 1 + stats.length) % stats.length);
-    };
-    
-    const nextBlog = () => {
-        setCurrentBlogIndex((prev) => (prev + 1) % blogPosts.length);
-    };
-    
-    const prevBlog = () => {
-        setCurrentBlogIndex((prev) => (prev - 1 + blogPosts.length) % blogPosts.length);
-    };
-    
-    // Handle drag start
-    const handleDragStart = (e, type) => {
-        setIsDragging(true);
-        if (e.type.includes('mouse')) {
-            setStartX(e.pageX);
-            setStartY(e.pageY);
-        } else {
-            setStartX(e.touches[0].pageX);
-            setStartY(e.touches[0].pageY);
-        }
-    };
-    
-    // Handle drag move
-    const handleDragMove = (e, type) => {
-        if (!isDragging) return;
-        
-        let currentX;
-        if (e.type.includes('mouse')) {
-            currentX = e.pageX;
-        } else {
-            currentX = e.touches[0].pageX;
-        }
-        
-        const diff = currentX - startX;
-        
-        if (type === 'blog') {
-            setTranslateX(diff);
-        }
-    };
-    
-    // Handle drag end
-    const handleDragEnd = (e, type) => {
-        if (!isDragging) return;
-        
-        let endX;
-        if (e.type.includes('mouse')) {
-            endX = e.pageX;
-        } else {
-            endX = e.changedTouches[0].pageX;
-        }
-        
-        const diff = endX - startX;
-        const threshold = 80; // Minimum drag distance to trigger slide change
-        
-        if (type === 'stat') {
-            if (Math.abs(diff) > threshold) {
-                if (diff > 0) {
-                    prevStat();
-                } else {
-                    nextStat();
-                }
-            }
-        } else if (type === 'blog') {
-            if (Math.abs(diff) > threshold) {
-                if (diff > 0) {
-                    prevBlog();
-                } else {
-                    nextBlog();
-                }
-            }
-            
-            // Reset translate
-            setTranslateX(0);
-        }
-        
-        setIsDragging(false);
-    };
-    
-    // Event listeners for circle stats slider
-    useEffect(() => {
-        const circleSlider = circleSliderRef.current;
-        if (!circleSlider) return;
-        
-        const handleMouseDown = (e) => handleDragStart(e, 'stat');
-        const handleMouseMove = (e) => handleDragMove(e, 'stat');
-        const handleMouseUp = (e) => handleDragEnd(e, 'stat');
-        const handleTouchStart = (e) => handleDragStart(e, 'stat');
-        const handleTouchMove = (e) => handleDragMove(e, 'stat');
-        const handleTouchEnd = (e) => handleDragEnd(e, 'stat');
-        
-        circleSlider.addEventListener('mousedown', handleMouseDown);
-        window.addEventListener('mousemove', handleMouseMove);
-        window.addEventListener('mouseup', handleMouseUp);
-        circleSlider.addEventListener('touchstart', handleTouchStart);
-        window.addEventListener('touchmove', handleTouchMove);
-        window.addEventListener('touchend', handleTouchEnd);
-        
-        return () => {
-            circleSlider.removeEventListener('mousedown', handleMouseDown);
-            window.removeEventListener('mousemove', handleMouseMove);
-            window.removeEventListener('mouseup', handleMouseUp);
-            circleSlider.removeEventListener('touchstart', handleTouchStart);
-            window.removeEventListener('touchmove', handleTouchMove);
-            window.removeEventListener('touchend', handleTouchEnd);
-        };
-    }, [isDragging]);
-    
-    // Event listeners for blog slider
-    useEffect(() => {
-        const blogSlider = blogSliderRef.current;
-        if (!blogSlider) return;
-        
-        const handleMouseDown = (e) => handleDragStart(e, 'blog');
-        const handleMouseMove = (e) => handleDragMove(e, 'blog');
-        const handleMouseUp = (e) => handleDragEnd(e, 'blog');
-        const handleTouchStart = (e) => handleDragStart(e, 'blog');
-        const handleTouchMove = (e) => handleDragMove(e, 'blog');
-        const handleTouchEnd = (e) => handleDragEnd(e, 'blog');
-        
-        blogSlider.addEventListener('mousedown', handleMouseDown);
-        window.addEventListener('mousemove', handleMouseMove);
-        window.addEventListener('mouseup', handleMouseUp);
-        blogSlider.addEventListener('touchstart', handleTouchStart);
-        window.addEventListener('touchmove', handleTouchMove);
-        window.addEventListener('touchend', handleTouchEnd);
-        
-        return () => {
-            blogSlider.removeEventListener('mousedown', handleMouseDown);
-            window.removeEventListener('mousemove', handleMouseMove);
-            window.removeEventListener('mouseup', handleMouseUp);
-            blogSlider.removeEventListener('touchstart', handleTouchStart);
-            window.removeEventListener('touchmove', handleTouchMove);
-            window.removeEventListener('touchend', handleTouchEnd);
-        };
-    }, [isDragging]);
-    
-    // Grain effect animation
-    useEffect(() => {
-        if (grainCanvasRef.current && contactGrainCanvasRef.current) {
-            const canvases = [grainCanvasRef.current, contactGrainCanvasRef.current];
-            
-            canvases.forEach(canvas => {
-                const ctx = canvas.getContext('2d');
-                const noise = () => Math.random() * 255;
-                
-                let isAnimating = true;
-                const generateNoise = () => {
-                    if (!isAnimating) return;
-                    
-                    const imgData = ctx.createImageData(canvas.width, canvas.height);
-                    const data = imgData.data;
-                    
-                    for (let i = 0; i < data.length; i += 4) {
-                        const value = noise();
-                        data[i] = value;
-                        data[i + 1] = value;
-                        data[i + 2] = value;
-                        data[i + 3] = Math.random() * 50;
-                    }
-                    
-                    ctx.putImageData(imgData, 0, 0);
-                    requestAnimationFrame(generateNoise);
-                };
-                
-                generateNoise();
-                
-                return () => {
-                    isAnimating = false;
-                };
-            });
-        }
-    }, []);
+
+ 
     
     // Toggle mobile menu
     const toggleMenu = () => {
@@ -260,62 +56,11 @@ export default function Portfolio() {
     };
     
     useEffect(() => {
-        const link = document.createElement('link');
-        link.href = 'https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap';
-        link.rel = 'stylesheet';
-        document.head.appendChild(link);
-        
-        // Add animation styles for gradient and logo animations
-        const style = document.createElement('style');
-        style.textContent = `
-          @keyframes gradient-x {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-          }
-          .animate-gradient-x {
-            background-size: 200% 200%;
-            animation: gradient-x 15s ease infinite;
-          }
-          @keyframes spin-slow {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-          }
-          .animate-spin-slow {
-            animation: spin-slow 12s linear infinite;
-          }
-          @keyframes bounce-slow {
-            0%, 100% { transform: translateY(0) rotate(45deg); }
-            50% { transform: translateY(-10px) rotate(45deg); }
-          }
-          .animate-bounce-slow {
-            animation: bounce-slow 6s ease-in-out infinite;
-          }
-          .bg-grid {
-            background-image: linear-gradient(to right, rgba(255, 255, 255, 0.1) 1px, transparent 1px),
-                              linear-gradient(to bottom, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
-            background-size: 20px 20px;
-          }
-          @keyframes pulse-wave {
-            0% { transform: scale(0.95); opacity: 1; }
-            50% { transform: scale(1.05); opacity: 0.8; }
-            100% { transform: scale(0.95); opacity: 1; }
-          }
-          .animate-pulse-wave {
-            animation: pulse-wave 4s ease-in-out infinite;
-          }
-        `;
-        document.head.appendChild(style);
-        
-        return () => {
-            document.head.removeChild(link);
-            document.head.removeChild(style);
-        };
-    }, []);
+        const timer = setInterval(() => {
+            setCurrentStatIndex((prev) => (prev + 1) % stats.length);
+        }, 5000); 
     
-    // Update initial stat to show 453K
-    useEffect(() => {
-        setCurrentStatIndex(1);
+        return () => clearInterval(timer);
     }, []);
     
     return (
@@ -467,9 +212,9 @@ export default function Portfolio() {
                                 <span className="w-0 h-0 rounded-full bg-white mr-0 group-hover:w-2 group-hover:h-2 group-hover:mr-2 transition-all duration-300"></span>
                                 About
                             </a>
-                            <a href="#blog" className="mobile-link text-[2rem] w-full border-b border-[#F9F8F6] pb-[0.3em] mb-[0.3em] cursor-pointer transition-all duration-300 hover:pl-2 flex items-center group">
+                            <a href="#skills" className="mobile-link text-[2rem] w-full border-b border-[#F9F8F6] pb-[0.3em] mb-[0.3em] cursor-pointer transition-all duration-300 hover:pl-2 flex items-center group">
                                 <span className="w-0 h-0 rounded-full bg-white mr-0 group-hover:w-2 group-hover:h-2 group-hover:mr-2 transition-all duration-300"></span>
-                                Blog
+                                Skills
                             </a>
                             <a href="#contact" className="mobile-link text-[2rem] w-full border-b border-[#F9F8F6] pb-[0.3em] mb-[0.3em] cursor-pointer transition-all duration-300 hover:pl-2 flex items-center group">
                                 <span className="w-0 h-0 rounded-full bg-white mr-0 group-hover:w-2 group-hover:h-2 group-hover:mr-2 transition-all duration-300"></span>
@@ -501,8 +246,8 @@ export default function Portfolio() {
                                 <span className="relative z-10">About</span>
                                 <span className="absolute bottom-0 left-0 w-0 h-[2px] bg-gradient-to-r from-[#6c72cb] to-[#cb69c1] group-hover:w-full transition-all duration-300 rounded-full"></span>
                             </a>
-                            <a href="#blog" className="text-base font-medium mx-[0.85em] leading-[1.15] transition-all duration-300 select-none relative group">
-                                <span className="relative z-10">Blog</span>
+                            <a href="#skills" className="text-base font-medium mx-[0.85em] leading-[1.15] transition-all duration-300 select-none relative group">
+                                <span className="relative z-10">Skills</span>
                                 <span className="absolute bottom-0 left-0 w-0 h-[2px] bg-gradient-to-r from-[#6c72cb] to-[#cb69c1] group-hover:w-full transition-all duration-300 rounded-full"></span>
                             </a>
                             <a href="#contact" className="text-base font-medium mx-[0.85em] mr-[2em] leading-[1.15] transition-all duration-300 select-none relative group">
@@ -583,7 +328,7 @@ export default function Portfolio() {
                                     
                                     <p className="max-w-[500px] mt-6 text-[1.1rem] leading-relaxed opacity-75">
                                         Crafting elegant digital solutions with a focus on user experience, 
-                                        performance and accessibility. Building the web of tomorrow, today.
+                                        performance and accessibility. Building the web of tomorrow, TODAY !
                                     </p>
                                     
                                     <div className="mt-8 flex flex-wrap gap-4">
@@ -600,8 +345,7 @@ export default function Portfolio() {
                             {/* Right side - Stats and Blog (independent) */}
                             <div className="w-full lg:w-[30%] h-full flex flex-col p-6 justify-center items-center gap-8 ml-auto">
                                 {/* Stats Component - Circular with 3D effect */}
-                                <div className="w-[350px] h-[350px] bg-black rounded-full flex flex-col items-center justify-center relative overflow-hidden shadow-xl group transition-all duration-500 hover:scale-[1.02]">
-                                    {/* Sophisticated background elements */}
+                                <div className="w-[330px] h-[420px] bg-black rounded-full flex flex-col items-center justify-center relative overflow-hidden shadow-xl group transition-all duration-500 hover:scale-[1.02]">                                    {/* Sophisticated background elements */}
                                     <div className="absolute inset-0 bg-gradient-to-br from-black to-gray-900"></div>
                                     <div className="absolute inset-0 opacity-30">
                                         <div className="absolute w-full h-full bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20"></div>
@@ -650,12 +394,11 @@ export default function Portfolio() {
                                     </svg>
                                     
                                     {/* Content with better typography */}
-                                    <div className="text-white flex flex-col items-center justify-center h-full z-10">
+                                    <div className="text-white flex flex-col items-center justify-center h-full z-10 p-6">
                                         <div className="text-[8rem] font-bold leading-none bg-gradient-to-br from-white via-purple-100 to-blue-200 bg-clip-text text-transparent transition-all duration-500 group-hover:scale-105">132</div>
                                         <div className="text-gray-400 text-center text-sm max-w-[60%] mt-2 tracking-wide">
-                                            LITERS OF COFFEE
+                                            LITERS OF COFFEE CONSUMED THIS YEAR
                                             <br />
-                                            <span className="text-gray-500 text-xs">CONSUMED THIS YEAR</span>
                                         </div>
                                     </div>
                                     
@@ -735,96 +478,115 @@ export default function Portfolio() {
                 </div>
             </div>
             
+
+
+
             {/* TECHNOLOGIES SECTION */}
             <section className="technologies w-full m-auto max-w-[1160px] px-[40px] mb-20" id="technologies">
                 <div className="technologies-content mt-[4em] flex flex-col items-center w-full">
-                    <p className="technologies-title text-[1.2rem] font-light tracking-[1px] uppercase opacity-50 mb-[4em]" style={{
-                        color: darkMode ? "#F9F8F6" : "#000"
-                    }}>Technologies & Tools</p>
+                    {/* Enhanced header with subtle animation */}
+                    <div className="section-header relative mb-16 flex flex-col items-center">
+                        <span className="absolute -top-8 opacity-5 text-[5rem] font-bold tracking-wider blur-sm">
+                            TECH STACK
+                        </span>
+                        <p className="technologies-title text-[1.2rem] font-light tracking-[1px] uppercase relative z-10 before:absolute before:w-12 before:h-[3px] before:bg-gradient-to-r before:from-[#6c72cb] before:to-[#cb69c1] before:-bottom-4 before:left-1/2 before:-translate-x-1/2" style={{
+                            color: darkMode ? "#F9F8F6" : "#000"
+                        }}>Technologies & Tools</p>
+                    </div>
                     
-                    {/* Main technologies grid - Replaced with animated icons */}
-                    <div className="w-full grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-                        {/* Programming Languages */}
-                        <div className="tech-category col-span-2 md:col-span-3 lg:col-span-4 mb-8">
-                            <h3 className="text-2xl font-semibold mb-6 flex items-center" style={{
-                                color: darkMode ? "#F9F8F6" : "#000"
-                            }}>
-                                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#4CAF50] to-[#8BC34A] flex items-center justify-center shadow-lg shadow-green-500/20 mr-3">
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M8 3L3 8L8 13" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                        <path d="M16 3L21 8L16 13" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                        <path d="M3 8H21" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                        <path d="M3 17H21" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                        <path d="M8 21L12 13L16 21" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                    </svg>
-                                </div>
-                                Programming Languages
-                            </h3>
+                    {/* Programming Languages - Enhanced styling */}
+                    <div className="tech-category w-full mb-16">
+                        <div className="category-header mb-8 flex items-center">
+                            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#4CAF50] to-[#8BC34A] flex items-center justify-center shadow-lg shadow-green-500/20 mr-4 rotate-3">
+                                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M8 3L3 8L8 13" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                    <path d="M16 3L21 8L16 13" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                    <path d="M3 8H21" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                    <path d="M3 17H21" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                    <path d="M8 21L12 13L16 21" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 className="text-2xl font-bold" style={{color: darkMode ? "#F9F8F6" : "#000"}}>
+                                    Programming Languages
+                                </h3>
+                                <div className="h-[2px] w-32 bg-gradient-to-r from-[#4CAF50]/80 to-transparent mt-1"></div>
+                            </div>
+                        </div>
+                        
+                        {/* Preserved your existing grid with enhanced hover effects */}
+                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-8">
+                            <TechIcon 
+                                name="Java" 
+                                color={darkMode ? "#f89820" : "#5382a1"} 
+                                className="transform hover:-translate-y-2 hover:scale-110 transition-all duration-300"
+                            />
+                            <TechIcon 
+                                name="Python" 
+                                color={darkMode ? "#4B8BBE" : "#306998"} 
+                                className="transform hover:-translate-y-2 hover:scale-110 transition-all duration-300"
+                            />
+                            <TechIcon 
+                                name="C#" 
+                                color={darkMode ? "#9B4F96" : "#68217A"} 
+                                className="transform hover:-translate-y-2 hover:scale-110 transition-all duration-300"
+                            />
+                            <TechIcon 
+                                name="C++" 
+                                color={darkMode ? "#649AD2" : "#044F88"} 
+                                className="transform hover:-translate-y-2 hover:scale-110 transition-all duration-300"
+                            />
+                            <TechIcon 
+                                name="JavaScript" 
+                                color={darkMode ? "#F7DF1E" : "#F0DB4F"} 
+                                className="transform hover:-translate-y-2 hover:scale-110 transition-all duration-300"
+                            />
+                            <TechIcon 
+                                name="TypeScript" 
+                                color={darkMode ? "#3178C6" : "#2F74C0"} 
+                                className="transform hover:-translate-y-2 hover:scale-110 transition-all duration-300"
+                            />
+                            <TechIcon 
+                                name="PHP" 
+                                color={darkMode ? "#8993be" : "#474A8A"} 
+                                className="transform hover:-translate-y-2 hover:scale-110 transition-all duration-300"
+                            />
+                        </div>
+                    </div>
+                    
+                    {/* Libraries and Frameworks - Enhanced styling */}
+                    <div className="tech-category w-full mb-16">
+                        <div className="category-header mb-8 flex items-center">
+                            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#9C27B0] to-[#673AB7] flex items-center justify-center shadow-lg shadow-purple-500/20 mr-4 -rotate-3">
+                                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 3L21 8V16L12 21L3 16V8L12 3Z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                    <path d="M16.5 10.5L7.5 15.5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                    <path d="M7.5 8.5L16.5 13.5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                    <path d="M12 3V21" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 className="text-2xl font-bold" style={{color: darkMode ? "#F9F8F6" : "#000"}}>
+                                    Libraries & Frameworks
+                                </h3>
+                                <div className="h-[2px] w-40 bg-gradient-to-r from-[#9C27B0]/80 to-transparent mt-1"></div>
+                            </div>
+                        </div>
+                        
+                        <div className="relative">
+                            {/* Subtle background decorative elements */}
+                            <div className="absolute -top-10 -left-10 w-40 h-40 rounded-full bg-gradient-to-br from-purple-500/5 to-transparent blur-3xl"></div>
+                            <div className="absolute -bottom-10 -right-10 w-40 h-40 rounded-full bg-gradient-to-br from-purple-500/5 to-transparent blur-3xl"></div>
                             
-                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
-                                <TechIcon 
-                                    name="Java" 
-                                    color={darkMode ? "#f89820" : "#5382a1"} 
-                                    className="transform hover:-translate-y-2 transition-transform duration-300"
-                                />
-                                <TechIcon 
-                                    name="Python" 
-                                    color={darkMode ? "#4B8BBE" : "#306998"} 
-                                    className="transform hover:-translate-y-2 transition-transform duration-300"
-                                />
-                                <TechIcon 
-                                    name="C#" 
-                                    color={darkMode ? "#9B4F96" : "#68217A"} 
-                                    className="transform hover:-translate-y-2 transition-transform duration-300"
-                                />
-                                <TechIcon 
-                                    name="C++" 
-                                    color={darkMode ? "#649AD2" : "#044F88"} 
-                                    className="transform hover:-translate-y-2 transition-transform duration-300"
-                                />
-                                <TechIcon 
-                                    name="JavaScript" 
-                                    color={darkMode ? "#F7DF1E" : "#F0DB4F"} 
-                                    className="transform hover:-translate-y-2 transition-transform duration-300"
-                                />
-                                <TechIcon 
-                                    name="TypeScript" 
-                                    color={darkMode ? "#3178C6" : "#2F74C0"} 
-                                    className="transform hover:-translate-y-2 transition-transform duration-300"
-                                />
-                                <TechIcon 
-                                    name="PHP" 
-                                    color={darkMode ? "#8993be" : "#474A8A"} 
-                                    className="transform hover:-translate-y-2 transition-transform duration-300"
-                                />
-                                
-                                    </div>
-                                </div>
-                                
-                        {/* Libraries and Frameworks */}
-                        <div className="tech-category col-span-2 md:col-span-3 lg:col-span-4 mb-8">
-                            <h3 className="text-2xl font-semibold mb-6 flex items-center" style={{
-                                            color: darkMode ? "#F9F8F6" : "#000"
-                            }}>
-                                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#9C27B0] to-[#673AB7] flex items-center justify-center shadow-lg shadow-purple-500/20 mr-3">
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M12 3L21 8V16L12 21L3 16V8L12 3Z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                        <path d="M16.5 10.5L7.5 15.5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                        <path d="M7.5 8.5L16.5 13.5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                        <path d="M12 3V21" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                    </svg>
-                                </div>
-                                Libraries & Frameworks
-                            </h3>
-                            
-                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
+                            {/* Grid with your existing components */}
+                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-y-10 gap-x-6 relative z-10">
                                 <TechIcon 
                                     name="Spring" 
                                     color={darkMode ? "#6DB33F" : "#6DB33F"} 
-                                    className="transform hover:-translate-y-2 transition-transform duration-300"
+                                    className="transform hover:-translate-y-2 hover:scale-110 transition-all duration-300"
                                 />
                                 <div 
-                                    className="tech-icon flex flex-col items-center justify-center transform hover:-translate-y-2 transition-transform duration-300"
+                                    className="tech-icon flex flex-col items-center justify-center transform hover:-translate-y-2 hover:scale-110 transition-all duration-300"
                                     onMouseEnter={(e) => e.currentTarget.querySelector('img').classList.add('scale-110')}
                                     onMouseLeave={(e) => e.currentTarget.querySelector('img').classList.remove('scale-110')}
                                 >
@@ -842,10 +604,10 @@ export default function Portfolio() {
                                 <TechIcon 
                                     name="Flask" 
                                     color={darkMode ? "#FFFFFF" : "#000000"} 
-                                    className="transform hover:-translate-y-2 transition-transform duration-300"
+                                    className="transform hover:-translate-y-2 hover:scale-110 transition-all duration-300"
                                 />
                                 <div 
-                                    className="tech-icon flex flex-col items-center justify-center transform hover:-translate-y-2 transition-transform duration-300"
+                                    className="tech-icon flex flex-col items-center justify-center transform hover:-translate-y-2 hover:scale-110 transition-all duration-300"
                                     onMouseEnter={(e) => e.currentTarget.querySelector('img').classList.add('scale-110')}
                                     onMouseLeave={(e) => e.currentTarget.querySelector('img').classList.remove('scale-110')}
                                 >
@@ -863,10 +625,10 @@ export default function Portfolio() {
                                 <TechIcon 
                                     name="React" 
                                     color={darkMode ? "#61DAFB" : "#149ECA"} 
-                                    className="transform hover:-translate-y-2 transition-transform duration-300"
+                                    className="transform hover:-translate-y-2 hover:scale-110 transition-all duration-300"
                                 />
                                 <div 
-                                    className="tech-icon flex flex-col items-center justify-center transform hover:-translate-y-2 transition-transform duration-300"
+                                    className="tech-icon flex flex-col items-center justify-center transform hover:-translate-y-2 hover:scale-110 transition-all duration-300"
                                     onMouseEnter={(e) => e.currentTarget.querySelector('img').classList.add('scale-110')}
                                     onMouseLeave={(e) => e.currentTarget.querySelector('img').classList.remove('scale-110')}
                                 >
@@ -884,183 +646,164 @@ export default function Portfolio() {
                                 <TechIcon 
                                     name="NextJS" 
                                     color={darkMode ? "#FFFFFF" : "#000000"} 
-                                    className="transform hover:-translate-y-2 transition-transform duration-300"
+                                    className="transform hover:-translate-y-2 hover:scale-110 transition-all duration-300"
                                 />
                                 <TechIcon 
                                     name="Laravel" 
                                     color={darkMode ? "#FF2D20" : "#FF2D20"} 
-                                    className="transform hover:-translate-y-2 transition-transform duration-300"
+                                    className="transform hover:-translate-y-2 hover:scale-110 transition-all duration-300"
                                 />
-                                <div 
-                                    className="tech-icon flex flex-col items-center justify-center transform hover:-translate-y-2 transition-transform duration-300"
-                                    onMouseEnter={(e) => e.currentTarget.querySelector('img').classList.add('scale-110')}
-                                    onMouseLeave={(e) => e.currentTarget.querySelector('img').classList.remove('scale-110')}
-                                >
-                                    <div className="relative flex items-center justify-center rounded-full overflow-hidden transition-all duration-300 ease-in-out" style={{ width: "50px", height: "50px" }}>
-                                        <img 
-                                            src="/tech-stack/kafka.svg" 
-                                            alt="Kafka" 
-                                            className="w-[35px] h-[35px] transition-all duration-300 animate-fadeIn"
-                                        />
-                                    </div>
-                                    <span className="mt-2 text-sm font-medium opacity-70 transition-all duration-300" style={{ color: darkMode ? "#231F20" : "#231F20" }}>
-                                        Kafka
-                                    </span>
-                                </div>
                             </div>
                         </div>
-                                
-                        {/* Databases */}
-                        <div className="tech-category col-span-2 md:col-span-3 lg:col-span-4 mb-8">
-                            <h3 className="text-2xl font-semibold mb-6 flex items-center" style={{
-                                            color: darkMode ? "#F9F8F6" : "#000"
-                            }}>
-                                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#2196F3] to-[#03A9F4] flex items-center justify-center shadow-lg shadow-blue-500/20 mr-3">
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M12 5C16.4183 5 20 4.32843 20 3.5C20 2.67157 16.4183 2 12 2C7.58172 2 4 2.67157 4 3.5C4 4.32843 7.58172 5 12 5Z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                        <path d="M20 3.5V20.5C20 21.3284 16.4183 22 12 22C7.58172 22 4 21.3284 4 20.5V3.5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                        <path d="M20 12C20 12.8284 16.4183 13.5 12 13.5C7.58172 13.5 4 12.8284 4 12" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                        <path d="M20 16.5C20 17.3284 16.4183 18 12 18C7.58172 18 4 17.3284 4 16.5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                        <path d="M20 7.5C20 8.32843 16.4183 9 12 9C7.58172 9 4 8.32843 4 7.5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                    </svg>
-                                </div>
-                                Databases
-                            </h3>
-                            
-                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
+                    </div>
+                    
+                    {/* Databases - Enhanced styling */}
+                    <div className="tech-category w-full mb-16">
+                        <div className="category-header mb-8 flex items-center">
+                            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#2196F3] to-[#03A9F4] flex items-center justify-center shadow-lg shadow-blue-500/20 mr-4 rotate-2">
+                                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 5C16.4183 5 20 4.32843 20 3.5C20 2.67157 16.4183 2 12 2C7.58172 2 4 2.67157 4 3.5C4 4.32843 7.58172 5 12 5Z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                    <path d="M20 3.5V20.5C20 21.3284 16.4183 22 12 22C7.58172 22 4 21.3284 4 20.5V3.5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                    <path d="M20 12C20 12.8284 16.4183 13.5 12 13.5C7.58172 13.5 4 12.8284 4 12" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 className="text-2xl font-bold" style={{color: darkMode ? "#F9F8F6" : "#000"}}>
+                                    Databases
+                                </h3>
+                                <div className="h-[2px] w-28 bg-gradient-to-r from-[#2196F3]/80 to-transparent mt-1"></div>
+                            </div>
+                        </div>
+                        
+                        {/* Enhanced wrapper with highlights */}
+                        <div className="bg-gradient-to-br from-blue-500/5 to-transparent p-8 rounded-3xl border border-blue-500/10">
+                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-6">
                                 <TechIcon 
                                     name="PostgreSQL" 
                                     color={darkMode ? "#336791" : "#0064a5"} 
-                                    className="transform hover:-translate-y-2 transition-transform duration-300"
+                                    className="transform hover:-translate-y-2 hover:scale-110 transition-all duration-300"
                                 />
                                 <TechIcon 
                                     name="MySQL" 
                                     color={darkMode ? "#005571" : "#005571"} 
-                                    className="transform hover:-translate-y-2 transition-transform duration-300"
+                                    className="transform hover:-translate-y-2 hover:scale-110 transition-all duration-300"
                                 />
                                 <TechIcon 
                                     name="MongoDB" 
                                     color={darkMode ? "#47A248" : "#13AA52"} 
-                                    className="transform hover:-translate-y-2 transition-transform duration-300"
+                                    className="transform hover:-translate-y-2 hover:scale-110 transition-all duration-300"
                                 />
                                 <TechIcon 
                                     name="Firebase" 
                                     color={darkMode ? "#FFCA28" : "#FFA000"} 
-                                    className="transform hover:-translate-y-2 transition-transform duration-300"
+                                    className="transform hover:-translate-y-2 hover:scale-110 transition-all duration-300"
                                 />
                                 <TechIcon 
                                     name="Oracle" 
                                     color={darkMode ? "#F80000" : "#F80000"} 
-                                    className="transform hover:-translate-y-2 transition-transform duration-300"
+                                    className="transform hover:-translate-y-2 hover:scale-110 transition-all duration-300"
                                 />
                                 <TechIcon 
                                     name="Elasticsearch" 
                                     color={darkMode ? "#005571" : "#005571"} 
-                                    className="transform hover:-translate-y-2 transition-transform duration-300"
+                                    className="transform hover:-translate-y-2 hover:scale-110 transition-all duration-300"
                                 />
-                                    </div>
-                                    </div>
-                                </div>
-                                
-                    {/* Tools tag cloud - Keep this section but enhance it */}
-                    <div className="mt-8 w-full">
-                        <h3 className="text-2xl font-semibold mb-6 flex items-center" style={{
-                            color: darkMode ? "#F9F8F6" : "#000"
-                        }}>
-                            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#9C27B0] to-[#673AB7] flex items-center justify-center shadow-lg shadow-purple-500/20 mr-3">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {/* DevOps & Cloud - Enhanced styling */}
+                    <div className="tech-category w-full mb-16">
+                        <div className="category-header mb-8 flex items-center">
+                            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#9C27B0] to-[#673AB7] flex items-center justify-center shadow-lg shadow-purple-500/20 mr-4 -rotate-2">
+                                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M12 4C10.3431 4 9 5.34315 9 7C9 8.65685 10.3431 10 12 10C13.6569 10 15 8.65685 15 7C15 5.34315 13.6569 4 12 4Z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                                     <path d="M4 12C4 10.3431 5.34315 9 7 9H17C18.6569 9 20 10.3431 20 12V20C20 21.6569 18.6569 23 17 23H7C5.34315 23 4 21.6569 4 20V12Z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                                 </svg>
                             </div>
-                            DevOps & Cloud Services
-                        </h3>
-                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
-                        <TechIcon 
-                            name="git" 
-                            color={darkMode ? "#F05032" : "#F05032"} 
-                            className="transform hover:-translate-y-2 transition-transform duration-300"
-                        />
-                        <TechIcon 
-                            name="docker" 
-                            color={darkMode ? "#4285F4" : "#4285F4"} 
-                            className="transform hover:-translate-y-2 transition-transform duration-300"
-                        />
-                        <TechIcon 
-                            name="kubernetes" 
-                            color={darkMode ? "#326CE5" : "#326CE5"} 
-                            className="transform hover:-translate-y-2 transition-transform duration-300"
-                        />
-                        <TechIcon 
-                            name="terraform" 
-                            color={darkMode ? "#623CE4" : "#623CE4"} 
-                            className="transform hover:-translate-y-2 transition-transform duration-300"
-                        />
-                        <TechIcon 
-                            name="jenkins" 
-                            color={darkMode ? "#D24939" : "#D24939"} 
-                            className="transform hover:-translate-y-2 transition-transform duration-300"
-                        />
-                        <TechIcon 
-                            name="github actions" 
-                            color={darkMode ? "#2088FF" : "#2088FF"} 
-                            className="transform hover:-translate-y-2 transition-transform duration-300"
-                        />
-                        <TechIcon 
-                            name="apache" 
-                            color={darkMode ? "#343434" : "#343434"} 
-                            className="transform hover:-translate-y-2 transition-transform duration-300"
-                        />
-                        <TechIcon 
-                            name="tomcat" 
-                            color={darkMode ? "#FF9900" : "#FF9900"} 
-                            className="transform hover:-translate-y-2 transition-transform duration-300"
-                        />
-                        <TechIcon 
-                            name="nginx" 
-                            color={darkMode ? "#009639" : "#009639"} 
-                            className="transform hover:-translate-y-2 transition-transform duration-300"
-                        />
-                        <TechIcon 
-                            name="graphql" 
-                            color={darkMode ? "#E10098" : "#E10098"} 
-                            className="transform hover:-translate-y-2 transition-transform duration-300"
-                        />
-                        <TechIcon 
-                            name="AWS" 
-                            color={darkMode ? "#FF9900" : "#FF9900"} 
-                            className="transform hover:-translate-y-2 transition-transform duration-300"
-                        />
-                        
+                            <div>
+                                <h3 className="text-2xl font-bold" style={{color: darkMode ? "#F9F8F6" : "#000"}}>
+                                    DevOps & Cloud Services
+                                </h3>
+                                <div className="h-[2px] w-48 bg-gradient-to-r from-[#9C27B0]/80 to-transparent mt-1"></div>
+                            </div>
                         </div>
                         
-                        <h3 className="text-xl font-semibold mb-6 text-center" style={{
-                            color: darkMode ? "#F9F8F6" : "#000"
-                        }}>Other Technologies</h3>
-                        
-                        <div className="flex flex-wrap justify-center gap-3">
-                            {["Git", "GitHub", "Docker", "AWS", "Vercel", "Jest", "Testing Library", "Redux", "Zustand", "Framer Motion", 
-                              "GraphQL", "Firebase", "Webpack", "Vite", "SCSS", "Storybook", "CI/CD", "Accessibility", "SEO", "Performance Optimization"]
-                              .map((tool, index) => (
-                                <div key={index} 
-                                    className="px-4 py-2 rounded-full border 
-                                    transform hover:scale-110 hover:-translate-y-1 
-                                    transition-all duration-300 cursor-default
-                                    hover:shadow-md hover:bg-opacity-20 backdrop-blur-sm"
-                                    style={{
-                                        color: darkMode ? "#F9F8F6" : "#000",
-                                        backgroundColor: `rgba(${108 + index % 50}, ${114 + index % 30}, ${203 - index % 40}, 0.1)`,
-                                        borderColor: `rgba(${108 + index % 50}, ${114 + index % 30}, ${203 - index % 40}, 0.3)`
-                                    }}
-                                >
-                                    {tool}
+                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-y-8 gap-x-4">
+                            <TechIcon 
+                                name="git" 
+                                color={darkMode ? "#F05032" : "#F05032"} 
+                                className="transform hover:scale-110 transition-all duration-300"
+                            />
+                            <div 
+                                className="tech-icon flex flex-col items-center justify-center transform hover:scale-110 transition-all duration-300"
+                                onMouseEnter={(e) => e.currentTarget.querySelector('img').classList.add('scale-110')}
+                                onMouseLeave={(e) => e.currentTarget.querySelector('img').classList.remove('scale-110')}
+                            >
+                                <div className="relative flex items-center justify-center rounded-full overflow-hidden transition-all duration-300 ease-in-out" style={{ width: "50px", height: "50px" }}>
+                                    <img 
+                                        src="/tech-stack/gitlab.svg" 
+                                        alt="GitLab CI" 
+                                        className="w-[35px] h-[35px] transition-all duration-300 animate-fadeIn"
+                                    />
                                 </div>
-                            ))}
+                                <span className="mt-2 text-sm font-medium opacity-70 transition-all duration-300" style={{ color: darkMode ? "#FC6D26" : "#FC6D26" }}>
+                                    GitLab CI
+                                </span>
+                            </div>
+                            <TechIcon 
+                                name="docker" 
+                                color={darkMode ? "#4285F4" : "#4285F4"} 
+                                className="transform hover:scale-110 transition-all duration-300"
+                            />
+                            <TechIcon 
+                                name="kubernetes" 
+                                color={darkMode ? "#326CE5" : "#326CE5"} 
+                                className="transform hover:scale-110 transition-all duration-300"
+                            />
+                            <div 
+                                className="tech-icon flex flex-col items-center justify-center transform hover:scale-110 transition-all duration-300"
+                                onMouseEnter={(e) => e.currentTarget.querySelector('img').classList.add('scale-110')}
+                                onMouseLeave={(e) => e.currentTarget.querySelector('img').classList.remove('scale-110')}
+                            >
+                                <div className="relative flex items-center justify-center rounded-full overflow-hidden transition-all duration-300 ease-in-out" style={{ width: "50px", height: "50px" }}>
+                                    <img 
+                                        src="/tech-stack/terraform.svg" 
+                                        alt="Terraform" 
+                                        className="w-[35px] h-[35px] transition-all duration-300 animate-fadeIn"
+                                    />
+                                </div>
+                                <span className="mt-2 text-sm font-medium opacity-70 transition-all duration-300" style={{ color: darkMode ? "#7B42BC" : "#5C4EE5" }}>
+                                    Terraform
+                                </span>
+                            </div>
+                            <div 
+                                className="tech-icon flex flex-col items-center justify-center transform hover:scale-110 transition-all duration-300"
+                                onMouseEnter={(e) => e.currentTarget.querySelector('img').classList.add('scale-110')}
+                                onMouseLeave={(e) => e.currentTarget.querySelector('img').classList.remove('scale-110')}
+                            >
+                                <div className="relative flex items-center justify-center rounded-full overflow-hidden transition-all duration-300 ease-in-out" style={{ width: "50px", height: "50px" }}>
+                                    <img 
+                                        src="/tech-stack/jenkins.svg" 
+                                        alt="Jenkins" 
+                                        className="w-[35px] h-[35px] transition-all duration-300 animate-fadeIn"
+                                    />
+                                </div>
+                                <span className="mt-2 text-sm font-medium opacity-70 transition-all duration-300" style={{ color: darkMode ? "#D24939" : "#D24939" }}>
+                                    Jenkins
+                                </span>
+                            </div>
+                            <TechIcon 
+                                name="AWS" 
+                                color={darkMode ? "#FF9900" : "#FF9900"} 
+                                className="transform hover:scale-110 transition-all duration-300"
+                            />
                         </div>
                     </div>
                 </div>
             </section>
-            
+
+
             {/* PROJECTS SECTION */}
             <section className="projects w-full m-auto max-w-[1160px] px-[40px]" id="projects">
                 <div className="projects-content mt-[6em] flex flex-col items-center w-full">
@@ -1154,61 +897,155 @@ export default function Portfolio() {
             </section>
 
             {/* ABOUT SECTION */}
-            <section className="about overflow-x-hidden w-full m-[6em_auto] max-w-[1160px] px-[40px]" id="about">
-                <div className="about-content overflow-hidden py-[4em] flex gap-[4em]">
-                    <div className="videos relative w-fit">
-                        <video className="about-video w-full max-w-[400px] min-w-[300px] rounded-[30px]" preload="none" autoPlay loop playsInline poster="https://davidhaz.com/images/pic_placeholder.webp">
-                            <source src="https://davidhaz.com/videos/photo_0.mp4" type="video/mp4" />
-                        </video>
-                        
-                        <video className="about-video-overlay max-w-[300px] absolute transform rotate-[-20deg] scale-150 z-[2] right-[-70px] bottom-[-70px] mix-blend-mode-exclusion transition-transform duration-400" preload="none" autoPlay loop playsInline poster="https://davidhaz.com/images/hello_480_placeholder.webp" style={{
-                            filter: darkMode ? "none" : "grayscale(100%)"
-                        }}>
-                            <source src="https://davidhaz.com/videos/photo_01.mp4" type="video/mp4" />
-                        </video>
+            <section className="about w-full m-[8em_auto] max-w-[1160px] px-[40px]" id="about">
+                <div className="section-header relative mb-16 flex flex-col items-center">
+                    <p className="section-title text-[1.2rem] font-light tracking-[1px] uppercase relative z-10 before:absolute before:w-12 before:h-[3px] before:bg-gradient-to-r before:from-[#6c72cb] before:to-[#cb69c1] before:-bottom-4 before:left-1/2 before:-translate-x-1/2" style={{
+                        color: darkMode ? "#F9F8F6" : "#000"
+                    }}>Who am I</p>
+                </div>
+
+                {/* Enhanced grid layout with motion effects */}
+                <div className="about-content relative overflow-visible py-[2em] grid grid-cols-1 md:grid-cols-[1fr_1.5fr] gap-[4em]">
+                    {/* Floating elements - decorative shapes with improved animations */}
+                    <div className="absolute hidden md:block">
+                        <motion.div 
+                            className="absolute -top-20 -left-10 w-20 h-20 rounded-full border border-[#6c72cb]/20 opacity-50"
+                            animate={{ 
+                                y: [0, -15, 0],
+                                rotate: [0, 5, 0]
+                            }}
+                            transition={{ 
+                                repeat: Infinity,
+                                duration: 6,
+                                ease: "easeInOut"
+                            }}
+                        ></motion.div>
+                        <motion.div 
+                            className="absolute top-40 -right-10 w-16 h-16 rounded-md rotate-12 border border-[#cb69c1]/20 opacity-30"
+                            animate={{ 
+                                y: [0, 15, 0],
+                                rotate: [12, 20, 12]
+                            }}
+                            transition={{ 
+                                repeat: Infinity,
+                                duration: 7,
+                                ease: "easeInOut"
+                            }}
+                        ></motion.div>
+                        <motion.div 
+                            className="absolute -bottom-10 left-1/3 w-12 h-12 rounded-lg rotate-45 bg-gradient-to-br from-[#6c72cb]/5 to-[#cb69c1]/5"
+                            animate={{ 
+                                y: [0, -10, 0],
+                                x: [0, 5, 0],
+                                rotate: [45, 35, 45]
+                            }}
+                            transition={{ 
+                                repeat: Infinity,
+                                duration: 5,
+                                ease: "easeInOut"
+                            }}
+                        ></motion.div>
                     </div>
                     
-                    <div className="text w-full h-[400px] flex flex-col justify-between" style={{
+                    {/* Enhanced profile container */}
+                    <motion.div 
+                        className="profile-container relative w-full h-[450px] group justify-self-center md:justify-self-start"
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.8 }}
+                    >
+                        <motion.div 
+                            className="relative w-full h-full rounded-3xl overflow-hidden shadow-2xl shadow-purple-500/10"
+                            whileHover={{ scale: 1.02 }}
+                            transition={{ duration: 0.4 }}
+                        >
+                            {/* Main image with parallax effect */}
+                            <motion.img 
+                                className="w-full h-full object-cover"
+                                src="/main.jpeg" 
+                                alt="Profile"
+                                whileHover={{ scale: 1.08 }}
+                                transition={{ duration: 1.2, ease: [0.33, 1, 0.68, 1] }}
+                            />
+                            
+                            {/* Overlay gradients */}
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-60"></div>
+                            <div className="absolute inset-0 bg-gradient-to-br from-[#6c72cb]/20 via-transparent to-[#cb69c1]/20 mix-blend-overlay"></div>
+                            
+                            {/* Interactive hover effect */}
+                            <div className="absolute inset-0 bg-gradient-to-br from-[#6c72cb]/0 to-[#cb69c1]/0 group-hover:from-[#6c72cb]/20 group-hover:to-[#cb69c1]/20 transition-all duration-500 opacity-0 group-hover:opacity-100"></div>
+                            
+                            {/* Modern grid pattern overlay */}
+                            <div className="absolute inset-0 bg-[linear-gradient(to_right,transparent_49.5%,rgba(255,255,255,0.05)_49.5%,rgba(255,255,255,0.05)_50.5%,transparent_50.5%),linear-gradient(to_bottom,transparent_49.5%,rgba(255,255,255,0.05)_49.5%,rgba(255,255,255,0.05)_50.5%,transparent_50.5%)] bg-[length:30px_30px] mix-blend-overlay opacity-30"></div>
+                        </motion.div>
+                        
+                        {/* Experience badge with enhanced animation */}
+                        <motion.div 
+                            className="absolute -bottom-6 -right-6 w-[140px] h-[140px] bg-gradient-to-br from-[#6c72cb] to-[#cb69c1] rounded-full flex items-center justify-center shadow-lg"
+                            initial={{ rotate: 12, scale: 0.9, opacity: 0 }}
+                            animate={{ rotate: 12, scale: 1, opacity: 1 }}
+                            transition={{ delay: 0.4, duration: 0.6 }}
+                            whileHover={{ rotate: 0, scale: 1.05 }}
+                        >
+                            <div className="absolute inset-[3px] rounded-full bg-black flex flex-col items-center justify-center text-white">
+                                <span className="text-4xl font-bold">5+</span>
+                                <span className="text-xs tracking-wide mt-1">YEARS EXP</span>
+                            </div>
+                        </motion.div>
+                    </motion.div>
+                    
+                    {/* Text content with enhanced layout and spacing */}
+                    <div className="text w-full flex flex-col justify-between" style={{
                         color: darkMode ? "#F9F8F6" : "#000"
                     }}>
-                        <p className="text-[2.2rem] max-w-[28ch] min-w-[20ch] mb-[1em] font-light">
-                            <span className="word">I'm&nbsp;</span>
-                            <span className="word">a&nbsp;</span>
-                            <span className="word">web&nbsp;</span>
-                            <span className="word font-semibold">developer&nbsp;</span>
-                            <span className="word">&amp;&nbsp;</span>
-                            <span className="word font-semibold">designer&nbsp;</span>
-                            <span className="word">based&nbsp;</span>
-                            <span className="word">in&nbsp;</span>
-                            <span className="word">Cluj-Napoca!&nbsp;</span>
-                            <span className="word">I&nbsp;</span>
-                            <span className="word">specialize&nbsp;</span>
-                            <span className="word">in&nbsp;</span>
-                            <span className="word font-semibold">Frontend&nbsp;</span>
-                            <span className="word font-semibold">Engineering,&nbsp;</span>
-                            <span className="word">focusing&nbsp;</span>
-                            <span className="word">on&nbsp;</span>
-                            <span className="word">building&nbsp;</span>
-                            <span className="word">high&nbsp;</span>
-                            <span className="word">quality&nbsp;</span>
-                            <span className="word">web&nbsp;</span>
-                            <span className="word">experiences&nbsp;</span>
-                            <span className="word">through&nbsp;</span>
-                            <span className="word font-semibold">clean&nbsp;</span>
-                            <span className="word font-semibold">code&nbsp;</span>
-                            <span className="word">and&nbsp;</span>
-                            <span className="word">thoughtful&nbsp;</span>
-                            <span className="word">design.&nbsp;</span>
-                        </p>
+
+                        {/* Enhanced main content paragraph with animated reveal */}
+                        <motion.p 
+                            className="text-4xl md:text-3xl max-w-[50ch] mb-[1em] font-medium leading-relaxed"
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.6, duration: 0.8 }}
+                        >
+                            I'm a creative problem-solver with a passion for turning complex challenges into 
+                            <motion.span 
+                                className="relative mx-2 inline-block"
+                                whileHover={{ scale: 1.05 }}
+                            >
+                                <span className="relative z-10 text-white px-2 py-0.5 font-semibold">elegant solutions</span>
+                                <span className="absolute inset-0 bg-gradient-to-r from-[#6c72cb] to-[#cb69c1] rounded-md transform -skew-x-6"></span>
+                            </motion.span>. 
+                            With experience in full-stack development, 
+                            I thrive on building
+                            <motion.span 
+                                className="relative mx-2 inline-block"
+                                whileHover={{ scale: 1.05 }}
+                            >
+                                <span className="relative z-10 text-white px-2 py-0.5 font-semibold">intuitive, scalable</span>
+                                <span className="absolute inset-0 bg-gradient-to-r from-[#cb69c1] to-[#6c72cb] rounded-md transform skew-x-6"></span>
+                            </motion.span> 
+                            high quality web experiences through clean code and thoughtful design. 
+                        </motion.p>
                         
-                        <a href="#contact" className="star-button blur blur-visible w-fit mb-0 py-[0.5em] px-[1em] rounded-[50px] font-medium text-[1.8rem] flex gap-[0.3em] items-center transition-[filter,background-color,color] duration-300" style={{
-                            color: darkMode ? "#F9F8F6" : "#000",
-                            border: darkMode ? "2px solid #F9F8F6" : "2px solid #000"
-                        }}>
-                            <span className="text-[1.5rem]">✦</span>
-                            Get in touch
-                            <span className="text-[1.5rem]">✦</span>
-                        </a>
+                        
+                        {/* Call to action */}
+                        <motion.div
+                            className="" 
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 1.8, duration: 0.5 }}
+                        >
+                            <motion.a
+                                href="#contact"
+                                className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-[#6c72cb] to-[#cb69c1] text-white rounded-lg shadow-lg shadow-purple-500/20 font-medium"
+                                whileHover={{ scale: 1.05, boxShadow: "0 20px 25px -5px rgba(108, 114, 203, 0.2), 0 8px 10px -6px rgba(203, 105, 193, 0.2)" }}
+                                whileTap={{ scale: 0.98 }}
+                            >
+                                Get in touch
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                </svg>
+                            </motion.a>
+                        </motion.div>
                     </div>
                 </div>
             </section>
