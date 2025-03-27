@@ -1,10 +1,16 @@
 import { motion } from 'framer-motion';
 import React, { useContext, useEffect, useRef, useState } from "react";
+import 'swiper/css';
+import 'swiper/css/effect-fade';
+import 'swiper/css/pagination';
+import { Autoplay, EffectFade, Pagination } from 'swiper/modules';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import BlurText from '../assets/BlurText';
+import CountUp from '../assets/CountUp';
 import Iridescence from '../assets/iridescence';
 import RotatingText from '../assets/RotatingText';
 import TechIcon from '../assets/TechIcon';
 import { DarkModeContext } from "./DarkModeProvider";
-
 export default function Portfolio() {
     const { darkMode } = useContext(DarkModeContext);
     const grainCanvasRef = useRef(null);
@@ -16,8 +22,8 @@ export default function Portfolio() {
     // Stats and blog data
     const stats = [
         {
-            number: "3+",
-            text: "Years of experience in the field of web development"
+            number: "132+",
+            text: "Liters of coffee consumed this year"
         },
         {
             number: "8+",
@@ -25,7 +31,7 @@ export default function Portfolio() {
         },
         { 
             number: "100k+", 
-            text: "Lines of code authored across various languages and projects" 
+            text: "Total lines of code written" 
         },
         { 
             number: "50+", 
@@ -64,7 +70,7 @@ export default function Portfolio() {
     }, []);
     
     return (
-        <div className={`min-h-screen ${darkMode ? 'bg-black text-white' : 'bg-white text-black'}`} style={{ 
+        <div className={`min-h-screen w-full`} style={{ 
             fontFamily: "'Space Grotesk', sans-serif",
             letterSpacing: "-0.02em"
         }}>
@@ -76,7 +82,7 @@ export default function Portfolio() {
                 }}></div>
                 
                 {/* header container */}
-                <div className="header-container flex items-start w-full m-auto max-w-[1800px] px-[40px] z-[20]">
+                <div className="header-container flex items-start w-full m-auto max-w-[1800px] z-[20]">
                     {/* logo box */}
                     <div className="header-logo-box flex items-center justify-between w-auto pr-[1em] h-[80px] rounded-b-[30px] mr-[11px] relative z-[0] group" style={{
                         backgroundColor: darkMode ? "#000" : "white"
@@ -113,7 +119,7 @@ export default function Portfolio() {
                             </defs>
                         </svg>
                         {/* bottom right corner inverse */}
-                        <svg className="svg-corner corner-logo-box-two absolute -bottom-7 rotate-0 z-[99]" width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <svg className="svg-corner corner-logo-box-two absolute ml-[2em] -bottom-7 rotate-0 z-[99]" width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <g clipPath="url(#clip0_310_2)">
                                 <path d="M30 0H0V30C0 13.431 13.431 0 30 0Z" fill="white"></path>
                             </g>
@@ -127,7 +133,7 @@ export default function Portfolio() {
                                 </linearGradient>
                             </defs>
                         </svg>
-                        <a href="#" className="font-medium px-4 relative">
+                        <a href="#" className="font-medium px-4 ml-[2em] relative">
                             {/* Background animated shapes */}
                             <div className="absolute inset-0 opacity-5 pointer-events-none overflow-hidden">
                                 <div className="absolute w-8 h-8 rounded-full bg-gradient-to-r from-[#6c72cb] to-[#cb69c1] top-1 left-1 animate-pulse"></div>
@@ -265,13 +271,13 @@ export default function Portfolio() {
             </header>
 
             {/* HERO SECTION */}
-            <div className="hero mt-[10px] mb-[2rem] overflow-hidden">
-                <div className="main-container w-full m-auto px-[40px]">
-                    <div className="hero-container min-h-[630px] h-[85vh] overflow-hidden relative">
+            <div className="hero mt-[10px] overflow-hidden">
+                <div className="main-container w-full">
+                    <div className="min-h-[630px] h-[85vh] overflow-hidden relative">
                         {/* Content area with glass panels */}
                         <div className="w-full relative z-[3] flex flex-col lg:flex-row h-full justify-between">
                             {/* Main content on left with iridescence background */}
-                            <div className="w-full lg:w-[65%] h-full p-[2.5rem] md:p-[3.5rem] flex flex-col justify-between relative rounded-[20px] overflow-hidden">
+                            <div className="w-fit lg:w-[70%] ml-[2em] h-full p-[2.5rem] md:p-[3.5rem] flex flex-col justify-between relative rounded-[20px] overflow-hidden">
                                 {/* Iridescence background with rounded corners */}
                                 <div className="absolute inset-0 overflow-hidden rounded-[20px]">
                                     <div className="absolute inset-0 z-[1]">
@@ -326,10 +332,13 @@ export default function Portfolio() {
                                         </div>
                                     </h1>
                                     
-                                    <p className="max-w-[500px] mt-6 text-[1.1rem] leading-relaxed opacity-75">
-                                        Crafting elegant digital solutions with a focus on user experience, 
-                                        performance and accessibility. Building the web of tomorrow, TODAY !
-                                    </p>
+                                    <BlurText
+                                        text="Crafting elegant digital solutions with a focus on user experience, performance and accessibility. Building the web of tomorrow, TODAY !"
+                                        delay={100}
+                                        animateBy="words"
+                                        direction="top"
+                                        className="max-w-[500px] mt-6 text-[1.1rem] leading-relaxed opacity-75"
+                                    />
                                     
                                     <div className="mt-8 flex flex-wrap gap-4">
                                         <a href="#projects" className="btn-primary px-6 py-3 rounded-full bg-gradient-to-r from-[#6c72cb] to-[#cb69c1] text-white shadow-lg shadow-purple-500/20 font-medium">
@@ -343,9 +352,9 @@ export default function Portfolio() {
                             </div>
                             
                             {/* Right side - Stats and Blog (independent) */}
-                            <div className="w-full lg:w-[30%] h-full flex flex-col p-6 justify-center items-center gap-8 ml-auto">
+                            <div className="w-full lg:w-[27%] h-full flex flex-col gap-4 ml-[1em]">
                                 {/* Stats Component - Circular with 3D effect */}
-                                <div className="w-[330px] h-[420px] bg-black rounded-full flex flex-col items-center justify-center relative overflow-hidden shadow-xl group transition-all duration-500 hover:scale-[1.02]">                                    {/* Sophisticated background elements */}
+                                <div className="w-[310px] h-[450px] bg-black rounded-full flex flex-col items-center justify-center relative overflow-hidden shadow-xl group transition-all duration-500 hover:scale-[1.02]">                                    {/* Sophisticated background elements */}
                                     <div className="absolute inset-0 bg-gradient-to-br from-black to-gray-900"></div>
                                     <div className="absolute inset-0 opacity-30">
                                         <div className="absolute w-full h-full bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20"></div>
@@ -363,56 +372,80 @@ export default function Portfolio() {
                                         <div className="absolute w-1.5 h-1.5 rounded-full bg-indigo-300/30 animate-pulse-slow" style={{top: '80%', left: '20%', animationDelay: '1.5s'}}></div>
                                     </div>
                                     
-                                    {/* Circular progress indicator */}
-                                    <svg className="absolute inset-[20px] w-[calc(100%-40px)] h-[calc(100%-40px)] -rotate-90">
-                                        <circle 
-                                            cx="50%" 
-                                            cy="50%" 
-                                            r="calc(50% - 10px)" 
-                                            fill="none" 
-                                            stroke="rgba(139, 92, 246, 0.1)" 
-                                            strokeWidth="4"
-                                        />
-                                        <circle 
-                                            cx="50%" 
-                                            cy="50%" 
-                                            r="calc(50% - 10px)" 
-                                            fill="none" 
-                                            stroke="url(#statProgressGradient)" 
-                                            strokeWidth="4"
-                                            strokeDasharray="calc(3.14 * (100% - 20px))"
-                                            strokeDashoffset="calc(3.14 * (100% - 20px) * 0.25)"
-                                            strokeLinecap="round"
-                                        />
-                                        <defs>
-                                            <linearGradient id="statProgressGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                                                <stop offset="0%" stopColor="#8B5CF6" />
-                                                <stop offset="50%" stopColor="#EC4899" />
-                                                <stop offset="100%" stopColor="#8B5CF6" />
-                                            </linearGradient>
-                                        </defs>
-                                    </svg>
                                     
                                     {/* Content with better typography */}
-                                    <div className="text-white flex flex-col items-center justify-center h-full z-10 p-6">
-                                        <div className="text-[8rem] font-bold leading-none bg-gradient-to-br from-white via-purple-100 to-blue-200 bg-clip-text text-transparent transition-all duration-500 group-hover:scale-105">132</div>
-                                        <div className="text-gray-400 text-center text-sm max-w-[60%] mt-2 tracking-wide">
-                                            LITERS OF COFFEE CONSUMED THIS YEAR
-                                            <br />
-                                        </div>
-                                    </div>
+                                    <Swiper
+                                        spaceBetween={30}
+                                        slidesPerView={1}
+                                        scrollbar={{ draggable: true }}
+                                        autoplay={{
+                                            delay: 5000,
+                                            disableOnInteraction: false,
+                                        }}
+                                        pagination={{
+                                            clickable: true,
+                                            el: '.stats-pagination',
+                                            bulletClass: 'w-2 h-2 rounded-full bg-gray-600 cursor-pointer transition-all duration-300 mx-1',
+                                            bulletActiveClass: 'bg-purple-500 scale-110'
+                                        }}
+                                        modules={[Autoplay, Pagination, EffectFade]}
+                                        effect="cards"
+                                        fadeEffect={{ crossFade: true }}
+                                        onSlideChange={(swiper) => setCurrentStatIndex(swiper.activeIndex)}
+                                        className="stats-swiper w-full h-full"
+                                    >
+                                        {stats.map((stat, index) => (
+                                            <SwiperSlide key={index}>
+                                                <div className="text-white flex flex-col items-center justify-center h-full z-10 p-7">
+                                                <motion.div 
+                                                        className="text-[5rem] font-bold leading-none bg-gradient-to-br from-white via-purple-100 to-blue-200 bg-clip-text text-transparent"
+                                                        initial={{ scale: 0.9, opacity: 0 }}
+                                                        animate={{ scale: 1, opacity: 1 }}
+                                                        exit={{ scale: 0.9, opacity: 0 }}
+                                                        transition={{ duration: 0.5 }}
+                                                    >
+                                                        {stat.number.includes('k') ? (
+                                                            <>
+                                                                <CountUp
+                                                                    from={0}
+                                                                    to={parseInt(stat.number)}
+                                                                    separator=","
+                                                                    duration={1}
+                                                                    className="count-up-text"
+                                                                />
+                                                                k+
+                                                            </>
+                                                        ) : (
+                                                            <CountUp
+                                                                from={0}
+                                                                to={stat.number}
+                                                                separator=","
+                                                                duration={1}
+                                                                className="count-up-text"
+                                                            />
+                                                        )}
+                                                    </motion.div>
+                                                    <motion.div 
+                                                        className="text-gray-400 text-center text-[2em] md:text-base w-full max-w-[80%] mt-2 tracking-wide"
+                                                        initial={{ y: 10, opacity: 0 }}
+                                                        animate={{ y: 0, opacity: 1 }}
+                                                        exit={{ y: -10, opacity: 0 }}
+                                                        transition={{ duration: 0.5, delay: 0.1 }}
+                                                    >
+                                                        {stat.text}
+                                                    </motion.div>
+                                                </div>
+                                            </SwiperSlide>
+                                        ))}
+                                    </Swiper>
+
+                                    {/* Custom pagination container */}
+                                    <div className="stats-pagination absolute bottom-[1rem] flex justify-center w-full gap-2"></div>
                                     
-                                    {/* Interactive navigation dots */}
-                                    <div className="absolute bottom-[2rem] flex gap-2">
-                                        <div className="w-2 h-2 rounded-full bg-purple-500 cursor-pointer hover:scale-150 transition-transform"></div>
-                                        <div className="w-2 h-2 rounded-full bg-gray-600 cursor-pointer hover:scale-150 transition-transform"></div>
-                                        <div className="w-2 h-2 rounded-full bg-gray-600 cursor-pointer hover:scale-150 transition-transform"></div>
-                                        <div className="w-2 h-2 rounded-full bg-gray-600 cursor-pointer hover:scale-150 transition-transform"></div>
-                                    </div>
                                 </div>
                                 
                                 {/* Blog Component - Card with modern design */}
-                                <div className="w-[350px] overflow-hidden relative shadow-xl group transition-all duration-500 hover:scale-[1.02] rounded-2xl">
+                                <div className="w-[320px] relative transition-all duration-500 hover:scale-[1.02] rounded-2xl bottom-0">
                                     {/* Article image header with overlay */}
                                     <div className="h-[200px] bg-gradient-to-br from-[#6c5ce7] to-[#4834d4] relative">
                                         {/* Gradient mesh background */}
@@ -454,22 +487,6 @@ export default function Portfolio() {
                                         <p className="mt-3 text-sm text-gray-600 dark:text-gray-400 line-clamp-2 leading-relaxed">
                                             Learn how to create stunning visual effects with WebGL shaders and take your web experiences to the next level with this comprehensive guide.
                                         </p>
-                                        
-                                        {/* Footer with metadata and action */}
-                                        <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-800 flex justify-between items-center">
-                                            <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
-                                                <span>5 min read</span>
-                                                <span className="mx-2">•</span>
-                                                <span>Tutorial</span>
-                                            </div>
-                                            
-                                            {/* Read button with animation */}
-                                            <button className="w-10 h-10 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center text-purple-700 dark:text-purple-400 group-hover:bg-purple-700 dark:group-hover:bg-purple-700 group-hover:text-white transition-colors duration-300">
-                                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                    <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                                </svg>
-                                            </button>
-                                        </div>
                                     </div>
                                 </div>
                             </div>
