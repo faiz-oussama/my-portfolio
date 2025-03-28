@@ -17,7 +17,7 @@ export default function Portfolio() {
     const contactGrainCanvasRef = useRef(null);
     const [menuOpen, setMenuOpen] = useState(false);
     const [currentStatIndex, setCurrentStatIndex] = useState(0);
-    const [currentBlogIndex, setCurrentBlogIndex] = useState(0);
+    const [currentProjectIndex, setCurrentProjectIndex] = useState(0);
     
     // Stats and blog data
     const stats = [
@@ -39,18 +39,42 @@ export default function Portfolio() {
         }
     ];
     
-    const blogPosts = [
-        { 
-            image: "/assets/tailwind-blogpost-ylV1NaYL.svg", 
-            title: "Building a responsive design system with Tailwind CSS."
+    const ProjectsOverView = [
+        {
+            image: "path/to/maghrebai_copilot_image.jpg",
+            title: "MoroccoGuide-AI",
+            description: "An AI-Powered travel planner that creates personalized Morocco trip itineraries.",
+            technologies: ["Reactjs", "Nodejs", "Expressjs", "MongoDB", "GeminiAPI"]
         },
-        { 
-            image: "/assets/tailwind-blogpost-ylV1NaYL.svg", 
-            title: "Creating intuitive UI animations with React."
+        {
+            image: "path/to/logflow_analytics_image.jpg",
+            title: "LogFlow-Analytics",
+            description: "Real-Time Log Streaming and Analytics Platform for comprehensive log management.",
+            technologies: ["Java", "ELK Stack", "Kafka", "JavaFX"]
         },
-        { 
-            image: "/assets/tailwind-blogpost-ylV1NaYL.svg", 
-            title: "Best practices for modern web development."
+        {
+            image: "path/to/ai_visual_voice_search_image.jpg",
+            title: "Visual Search E-commerce Website",
+            description: "Visual and Voice Product Search using Deep Learning Models",
+            technologies: ["Flask", "Tensorflow"]
+        },
+        {
+            image: "path/to/gomaps_image.jpg",
+            title: "GoMaps",
+            description: "App that allows users to search for nearby places such as cafés, restaurants, hotels, and more.",
+            technologies: ["JavaScript", "Leaflet.js", "JavaFX"]
+        },
+        {
+            image: "path/to/university_management_system_image.jpg",
+            title: "University Management",
+            description: "Complete University Management System with student, faculty, and administrative features",
+            technologies: ["HTML", "CSS", "JavaScript", "PHP", "MySQL"]
+        },
+        {
+            image: "path/to/chat_app_advanced_image.jpg",
+            title: "Real-time Chat App",
+            description: "Real-time Chat Application with advanced features like file sharing, and more",
+            technologies: ["C++", "Sockets", "QT", "Multithreading"]
         }
     ];
 
@@ -392,7 +416,7 @@ export default function Portfolio() {
                                         effect="cards"
                                         fadeEffect={{ crossFade: true }}
                                         onSlideChange={(swiper) => setCurrentStatIndex(swiper.activeIndex)}
-                                        className="stats-swiper w-full h-full"
+                                        className="projects-swiper w-full h-full"
                                     >
                                         {stats.map((stat, index) => (
                                             <SwiperSlide key={index}>
@@ -445,49 +469,102 @@ export default function Portfolio() {
                                 </div>
                                 
                                 {/* Blog Component - Card with modern design */}
-                                <div className="w-[320px] relative transition-all duration-500 hover:scale-[1.02] rounded-2xl bottom-0">
-                                    {/* Article image header with overlay */}
-                                    <div className="h-[200px] bg-gradient-to-br from-[#6c5ce7] to-[#4834d4] relative">
-                                        {/* Gradient mesh background */}
-                                        <div className="absolute inset-0">
-                                            <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_-20%,#7c3aed,#4723d0)] mix-blend-multiply"></div>
-                                            <div className="absolute w-full h-full bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20"></div>
-                                        </div>
-                                        
-                                        {/* WebGL icon with glow effect */}
-                                        <div className="absolute inset-0 flex items-center justify-center">
-                                            <div className="relative group-hover:scale-110 group-hover:rotate-6 transition-all duration-500">
-                                                <div className="absolute inset-0 bg-[#844fee] blur-xl opacity-50 scale-150"></div>
-                                                <div className="relative p-4 bg-black/20 rounded-xl backdrop-blur-sm border border-white/10">
-                                                    <svg width="70" height="70" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                        <path d="M21 16.0022V7.99782C21 7.17476 20.4404 6.43606 19.6361 6.1817L13.6361 4.1817C12.8691 3.93502 12.0322 3.93502 11.2652 4.1817L5.26515 6.1817C4.46095 6.43606 3.90132 7.17476 3.90132 7.99782V16.0022C3.90132 16.8252 4.46094 17.5639 5.26515 17.8183L11.2652 19.8183C12.0322 20.065 12.8691 20.065 13.6361 19.8183L19.6361 17.8183C20.4404 17.5639 21 16.8252 21 16.0022Z" stroke="#f0c5ff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                                                        <path d="M3.90137 7.70423L12.0014 12.0042L20.1014 7.70423" stroke="#f0c5ff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                                                        <path d="M12 12V21" stroke="#f0c5ff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                                                        <path d="M12.0013 11.9988L7.80127 9.59882" stroke="#f0c5ff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                                                    </svg>
+                                <div className="w-[320px] h-full relative transition-all duration-500 hover:scale-[1.02] rounded-3xl bottom-0 overflow-hidden">
+                                <Swiper
+                                    spaceBetween={30}
+                                    slidesPerView={1}
+                                    scrollbar={{ draggable: true }}
+                                    autoplay={{
+                                        delay: 5000,
+                                        disableOnInteraction: false,
+                                    }}
+                                    pagination={{
+                                        clickable: true,
+                                        el: '.projects-pagination',
+                                        bulletClass: 'w-2 h-2 rounded-full bg-gray-600 cursor-pointer transition-all duration-300 mx-1',
+                                        bulletActiveClass: 'bg-purple-500 scale-110'
+                                    }}
+                                    modules={[Autoplay, Pagination, EffectFade]}
+                                    effect="cards"
+                                    fadeEffect={{ crossFade: true }}
+                                    onSlideChange={(swiper) => setCurrentProjectIndex(swiper.activeIndex)}
+                                    className="stats-swiper w-full h-full"
+                                >
+                                    {ProjectsOverView.map((project, index) => (
+                                        <SwiperSlide key={index}>
+                                            <div className="group h-full bg-white dark:bg-gray-900 rounded-3xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-500 transform hover:scale-[1.02] relative">
+                                                {/* Reduced header height to provide more room for content */}
+                                                <div className="h-[150px] bg-gradient-to-br from-[#6c5ce7] to-[#4834d4] relative overflow-hidden">
+                                                    <div className="absolute inset-0">
+                                                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_-20%,#7c3aed,#4723d0)] mix-blend-multiply"></div>
+                                                        <div className="absolute w-full h-full bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20"></div>
+                                                        
+                                                        {/* Animated particles */}
+                                                        <div className="absolute w-3 h-3 rounded-full bg-white/20 top-[20%] left-[15%] animate-pulse-slow"></div>
+                                                        <div className="absolute w-2 h-2 rounded-full bg-white/30 top-[60%] left-[80%] animate-pulse-slow" style={{animationDelay: '0.8s'}}></div>
+                                                        <div className="absolute w-4 h-4 rounded-full blur-sm bg-indigo-300/20 top-[30%] left-[50%] animate-float-slow"></div>
+                                                    </div>
+                                                    
+                                                    {/* Project icon/visual with optimized positioning */}
+                                                    <div className="absolute inset-0 flex items-center justify-center opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all duration-700">
+                                                        <div className="relative">
+                                                            <div className="absolute inset-0 bg-purple-400/20 blur-xl rounded-full scale-150"></div>
+                                                            {project.icon ? (
+                                                                <img 
+                                                                    src={project.icon} 
+                                                                    alt={project.title} 
+                                                                    className="w-16 h-16 object-contain relative z-10"
+                                                                />
+                                                            ) : (
+                                                                <div className="w-16 h-16 bg-white/10 backdrop-blur-sm rounded-xl border border-white/20 flex items-center justify-center relative z-10">
+                                                                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                                        <path d="M3 8L8 3M8 3L13 8M8 3V16" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                                                                        <path d="M16 21L11 16M16 21L21 16M16 21V8" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                                                                    </svg>
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    <div className="absolute top-0 left-0 right-0 h-20 bg-gradient-to-b from-black/20 to-transparent"></div>
                                                 </div>
+                                                
+                                                {/* Expanded content area with better spacing */}
+                                                <div className="h-[220px] p-6 overflow-hidden relative z-10 flex flex-col">
+                                                    {/* More compact tech stack display */}
+                                                    <div className="flex flex-wrap gap-1 mb-3">
+                                                        {project.technologies.slice(0, 4).map((tech, index) => (
+                                                            <span 
+                                                                key={index} 
+                                                                className="px-2 py-0.5 bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 text-xs font-medium rounded-full border border-blue-100 dark:border-blue-800/50 shadow-sm backdrop-blur-sm transition-all duration-300 hover:scale-105"
+                                                            >
+                                                                {tech}
+                                                            </span>
+                                                        ))}
+                                                        {project.technologies.length > 4 && (
+                                                            <span className="px-2 py-0.5 bg-gray-50 text-gray-500 dark:bg-gray-800/30 dark:text-gray-400 text-xs font-medium rounded-full border border-gray-100 dark:border-gray-800/50">
+                                                                +{project.technologies.length - 4}
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                    
+                                                    {/* Larger project title with better spacing */}
+                                                    <h3 className="text-2xl font-bold text-gray-900 dark:text-white group-hover:text-purple-700 dark:group-hover:text-purple-400 transition-colors duration-300 leading-tight mb-3">
+                                                        {project.title}
+                                                    </h3>
+                                                    
+                                                    {/* Expanded description area (3 lines instead of 2) */}
+                                                    <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-3 leading-relaxed mb-4 flex-grow">
+                                                        {project.description}
+                                                    </p>
+                                                    
+                                                </div>
+                                                
                                             </div>
-                                        </div>
-                                    </div>
+                                        </SwiperSlide>
+                                    ))}
                                     
-                                    {/* Content area with refined typography */}
-                                    <div className="bg-white dark:bg-gray-900 p-6">
-                                        {/* Tags with refined design */}
-                                        <div className="flex gap-2 mb-3">
-                                            <span className="px-3 py-1 bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-300 text-xs font-medium rounded-full">WebGL</span>
-                                            <span className="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 text-xs font-medium rounded-full">JavaScript</span>
-                                        </div>
-                                        
-                                        {/* Title with hover animation */}
-                                        <h3 className="text-xl font-bold text-gray-900 dark:text-white group-hover:text-purple-700 dark:group-hover:text-purple-400 transition-colors duration-300 leading-tight">
-                                            Getting started with WebGL shaders in JavaScript
-                                        </h3>
-                                        
-                                        {/* Description with elegant truncation */}
-                                        <p className="mt-3 text-sm text-gray-600 dark:text-gray-400 line-clamp-2 leading-relaxed">
-                                            Learn how to create stunning visual effects with WebGL shaders and take your web experiences to the next level with this comprehensive guide.
-                                        </p>
-                                    </div>
+                                </Swiper>
                                 </div>
                             </div>
                         </div>
@@ -498,393 +575,538 @@ export default function Portfolio() {
 
 
 
-            {/* TECHNOLOGIES SECTION */}
-            <section className="technologies w-full m-auto max-w-[1160px] px-[40px] mb-20" id="technologies">
-                <div className="technologies-content mt-[4em] flex flex-col items-center w-full">
-                    {/* Enhanced header with subtle animation */}
-                    <div className="section-header relative mb-16 flex flex-col items-center">
-                        <span className="absolute -top-8 opacity-5 text-[5rem] font-bold tracking-wider blur-sm">
-                            TECH STACK
-                        </span>
-                        <p className="technologies-title text-[1.2rem] font-light tracking-[1px] uppercase relative z-10 before:absolute before:w-12 before:h-[3px] before:bg-gradient-to-r before:from-[#6c72cb] before:to-[#cb69c1] before:-bottom-4 before:left-1/2 before:-translate-x-1/2" style={{
-                            color: darkMode ? "#F9F8F6" : "#000"
-                        }}>Technologies & Tools</p>
-                    </div>
-                    
-                    {/* Programming Languages - Enhanced styling */}
-                    <div className="tech-category w-full mb-16">
-                        <div className="category-header mb-8 flex items-center">
-                            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#4CAF50] to-[#8BC34A] flex items-center justify-center shadow-lg shadow-green-500/20 mr-4 rotate-3">
-                                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M8 3L3 8L8 13" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                    <path d="M16 3L21 8L16 13" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                    <path d="M3 8H21" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                    <path d="M3 17H21" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                    <path d="M8 21L12 13L16 21" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                </svg>
-                            </div>
-                            <div>
-                                <h3 className="text-2xl font-bold" style={{color: darkMode ? "#F9F8F6" : "#000"}}>
-                                    Programming Languages
-                                </h3>
-                                <div className="h-[2px] w-32 bg-gradient-to-r from-[#4CAF50]/80 to-transparent mt-1"></div>
-                            </div>
+                {/* TECHNOLOGIES SECTION */}
+                <section className="technologies w-full m-auto max-w-[1160px] px-[40px] mb-20" id="technologies">
+                    <div className="technologies-content mt-[4em] flex flex-col items-center w-full">
+                        {/* Enhanced header with subtle animation */}
+                        <div className="section-header relative mb-16 flex flex-col items-center">
+                            <span className="absolute -top-8 opacity-5 text-[5rem] font-bold tracking-wider blur-sm">
+                                TECH STACK
+                            </span>
+                            <p className="technologies-title text-[1.2rem] font-light tracking-[1px] uppercase relative z-10 before:absolute before:w-12 before:h-[3px] before:bg-gradient-to-r before:from-[#6c72cb] before:to-[#cb69c1] before:-bottom-4 before:left-1/2 before:-translate-x-1/2" style={{
+                                color: darkMode ? "#F9F8F6" : "#000"
+                            }}>Technologies & Tools</p>
                         </div>
                         
-                        {/* Preserved your existing grid with enhanced hover effects */}
-                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-8">
-                            <TechIcon 
-                                name="Java" 
-                                color={darkMode ? "#f89820" : "#5382a1"} 
-                                className="transform hover:-translate-y-2 hover:scale-110 transition-all duration-300"
-                            />
-                            <TechIcon 
-                                name="Python" 
-                                color={darkMode ? "#4B8BBE" : "#306998"} 
-                                className="transform hover:-translate-y-2 hover:scale-110 transition-all duration-300"
-                            />
-                            <TechIcon 
-                                name="C#" 
-                                color={darkMode ? "#9B4F96" : "#68217A"} 
-                                className="transform hover:-translate-y-2 hover:scale-110 transition-all duration-300"
-                            />
-                            <TechIcon 
-                                name="C++" 
-                                color={darkMode ? "#649AD2" : "#044F88"} 
-                                className="transform hover:-translate-y-2 hover:scale-110 transition-all duration-300"
-                            />
-                            <TechIcon 
-                                name="JavaScript" 
-                                color={darkMode ? "#F7DF1E" : "#F0DB4F"} 
-                                className="transform hover:-translate-y-2 hover:scale-110 transition-all duration-300"
-                            />
-                            <TechIcon 
-                                name="TypeScript" 
-                                color={darkMode ? "#3178C6" : "#2F74C0"} 
-                                className="transform hover:-translate-y-2 hover:scale-110 transition-all duration-300"
-                            />
-                            <TechIcon 
-                                name="PHP" 
-                                color={darkMode ? "#8993be" : "#474A8A"} 
-                                className="transform hover:-translate-y-2 hover:scale-110 transition-all duration-300"
-                            />
-                        </div>
-                    </div>
-                    
-                    {/* Libraries and Frameworks - Enhanced styling */}
-                    <div className="tech-category w-full mb-16">
-                        <div className="category-header mb-8 flex items-center">
-                            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#9C27B0] to-[#673AB7] flex items-center justify-center shadow-lg shadow-purple-500/20 mr-4 -rotate-3">
-                                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M12 3L21 8V16L12 21L3 16V8L12 3Z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                    <path d="M16.5 10.5L7.5 15.5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                    <path d="M7.5 8.5L16.5 13.5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                    <path d="M12 3V21" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                </svg>
+                        {/* Programming Languages - Enhanced styling */}
+                        <div className="tech-category w-full mb-16">
+                            <div className="category-header mb-8 flex items-center">
+                                <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#4CAF50] to-[#8BC34A] flex items-center justify-center shadow-lg shadow-green-500/20 mr-4 rotate-3">
+                                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M8 3L3 8L8 13" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                        <path d="M16 3L21 8L16 13" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                        <path d="M3 8H21" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                        <path d="M3 17H21" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                        <path d="M8 21L12 13L16 21" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h3 className="text-2xl font-bold" style={{color: darkMode ? "#F9F8F6" : "#000"}}>
+                                        Programming Languages
+                                    </h3>
+                                    <div className="h-[2px] w-32 bg-gradient-to-r from-[#4CAF50]/80 to-transparent mt-1"></div>
+                                </div>
                             </div>
-                            <div>
-                                <h3 className="text-2xl font-bold" style={{color: darkMode ? "#F9F8F6" : "#000"}}>
-                                    Libraries & Frameworks
-                                </h3>
-                                <div className="h-[2px] w-40 bg-gradient-to-r from-[#9C27B0]/80 to-transparent mt-1"></div>
-                            </div>
-                        </div>
-                        
-                        <div className="relative">
-                            {/* Subtle background decorative elements */}
-                            <div className="absolute -top-10 -left-10 w-40 h-40 rounded-full bg-gradient-to-br from-purple-500/5 to-transparent blur-3xl"></div>
-                            <div className="absolute -bottom-10 -right-10 w-40 h-40 rounded-full bg-gradient-to-br from-purple-500/5 to-transparent blur-3xl"></div>
                             
-                            {/* Grid with your existing components */}
-                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-y-10 gap-x-6 relative z-10">
+                            {/* Preserved your existing grid with enhanced hover effects */}
+                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-8">
                                 <TechIcon 
-                                    name="Spring" 
-                                    color={darkMode ? "#6DB33F" : "#6DB33F"} 
-                                    className="transform hover:-translate-y-2 hover:scale-110 transition-all duration-300"
-                                />
-                                <div 
-                                    className="tech-icon flex flex-col items-center justify-center transform hover:-translate-y-2 hover:scale-110 transition-all duration-300"
-                                    onMouseEnter={(e) => e.currentTarget.querySelector('img').classList.add('scale-110')}
-                                    onMouseLeave={(e) => e.currentTarget.querySelector('img').classList.remove('scale-110')}
-                                >
-                                    <div className="relative flex items-center justify-center rounded-full overflow-hidden transition-all duration-300 ease-in-out" style={{ width: "50px", height: "50px" }}>
-                                        <img 
-                                            src="/tech-stack/spring-boot.svg" 
-                                            alt="Spring Boot" 
-                                            className="w-[35px] h-[35px] transition-all duration-300 animate-fadeIn"
-                                        />
-                                    </div>
-                                    <span className="mt-2 text-sm font-medium opacity-70 transition-all duration-300" style={{ color: darkMode ? "#6DB33F" : "#6DB33F" }}>
-                                        Spring Boot
-                                    </span>
-                                </div>
-                                <TechIcon 
-                                    name="Flask" 
-                                    color={darkMode ? "#FFFFFF" : "#000000"} 
-                                    className="transform hover:-translate-y-2 hover:scale-110 transition-all duration-300"
-                                />
-                                <div 
-                                    className="tech-icon flex flex-col items-center justify-center transform hover:-translate-y-2 hover:scale-110 transition-all duration-300"
-                                    onMouseEnter={(e) => e.currentTarget.querySelector('img').classList.add('scale-110')}
-                                    onMouseLeave={(e) => e.currentTarget.querySelector('img').classList.remove('scale-110')}
-                                >
-                                    <div className="relative flex items-center justify-center rounded-full overflow-hidden transition-all duration-300 ease-in-out" style={{ width: "50px", height: "50px" }}>
-                                        <img 
-                                            src="/tech-stack/dotnet.svg" 
-                                            alt=".NET" 
-                                            className="w-[35px] h-[35px] transition-all duration-300 animate-fadeIn"
-                                        />
-                                    </div>
-                                    <span className="mt-2 text-sm font-medium opacity-70 transition-all duration-300" style={{ color: darkMode ? "#512BD4" : "#5C2D91" }}>
-                                        .NET
-                                    </span>
-                                </div>
-                                <TechIcon 
-                                    name="React" 
-                                    color={darkMode ? "#61DAFB" : "#149ECA"} 
-                                    className="transform hover:-translate-y-2 hover:scale-110 transition-all duration-300"
-                                />
-                                <div 
-                                    className="tech-icon flex flex-col items-center justify-center transform hover:-translate-y-2 hover:scale-110 transition-all duration-300"
-                                    onMouseEnter={(e) => e.currentTarget.querySelector('img').classList.add('scale-110')}
-                                    onMouseLeave={(e) => e.currentTarget.querySelector('img').classList.remove('scale-110')}
-                                >
-                                    <div className="relative flex items-center justify-center rounded-full overflow-hidden transition-all duration-300 ease-in-out" style={{ width: "50px", height: "50px" }}>
-                                        <img 
-                                            src="/tech-stack/react-native.svg" 
-                                            alt="React Native" 
-                                            className="w-[35px] h-[35px] transition-all duration-300 animate-fadeIn"
-                                        />
-                                    </div>
-                                    <span className="mt-2 text-sm font-medium opacity-70 transition-all duration-300" style={{ color: darkMode ? "#61DAFB" : "#149ECA" }}>
-                                        React Native
-                                    </span>
-                                </div>
-                                <TechIcon 
-                                    name="NextJS" 
-                                    color={darkMode ? "#FFFFFF" : "#000000"} 
+                                    name="Java" 
+                                    color={darkMode ? "#f89820" : "#5382a1"} 
                                     className="transform hover:-translate-y-2 hover:scale-110 transition-all duration-300"
                                 />
                                 <TechIcon 
-                                    name="Laravel" 
-                                    color={darkMode ? "#FF2D20" : "#FF2D20"} 
+                                    name="Python" 
+                                    color={darkMode ? "#4B8BBE" : "#306998"} 
                                     className="transform hover:-translate-y-2 hover:scale-110 transition-all duration-300"
                                 />
-                            </div>
-                        </div>
-                    </div>
-                    
-                    {/* Databases - Enhanced styling */}
-                    <div className="tech-category w-full mb-16">
-                        <div className="category-header mb-8 flex items-center">
-                            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#2196F3] to-[#03A9F4] flex items-center justify-center shadow-lg shadow-blue-500/20 mr-4 rotate-2">
-                                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M12 5C16.4183 5 20 4.32843 20 3.5C20 2.67157 16.4183 2 12 2C7.58172 2 4 2.67157 4 3.5C4 4.32843 7.58172 5 12 5Z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                    <path d="M20 3.5V20.5C20 21.3284 16.4183 22 12 22C7.58172 22 4 21.3284 4 20.5V3.5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                    <path d="M20 12C20 12.8284 16.4183 13.5 12 13.5C7.58172 13.5 4 12.8284 4 12" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                </svg>
-                            </div>
-                            <div>
-                                <h3 className="text-2xl font-bold" style={{color: darkMode ? "#F9F8F6" : "#000"}}>
-                                    Databases
-                                </h3>
-                                <div className="h-[2px] w-28 bg-gradient-to-r from-[#2196F3]/80 to-transparent mt-1"></div>
+                                <TechIcon 
+                                    name="C#" 
+                                    color={darkMode ? "#9B4F96" : "#68217A"} 
+                                    className="transform hover:-translate-y-2 hover:scale-110 transition-all duration-300"
+                                />
+                                <TechIcon 
+                                    name="C++" 
+                                    color={darkMode ? "#649AD2" : "#044F88"} 
+                                    className="transform hover:-translate-y-2 hover:scale-110 transition-all duration-300"
+                                />
+                                <TechIcon 
+                                    name="JavaScript" 
+                                    color={darkMode ? "#F7DF1E" : "#F0DB4F"} 
+                                    className="transform hover:-translate-y-2 hover:scale-110 transition-all duration-300"
+                                />
+                                <TechIcon 
+                                    name="TypeScript" 
+                                    color={darkMode ? "#3178C6" : "#2F74C0"} 
+                                    className="transform hover:-translate-y-2 hover:scale-110 transition-all duration-300"
+                                />
+                                <TechIcon 
+                                    name="PHP" 
+                                    color={darkMode ? "#8993be" : "#474A8A"} 
+                                    className="transform hover:-translate-y-2 hover:scale-110 transition-all duration-300"
+                                />
                             </div>
                         </div>
                         
-                        {/* Enhanced wrapper with highlights */}
-                        <div className="bg-gradient-to-br from-blue-500/5 to-transparent p-8 rounded-3xl border border-blue-500/10">
+                        {/* Libraries and Frameworks - Enhanced styling */}
+                        <div className="tech-category w-full mb-16">
+                            <div className="category-header mb-8 flex items-center">
+                                <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#9C27B0] to-[#673AB7] flex items-center justify-center shadow-lg shadow-purple-500/20 mr-4 -rotate-3">
+                                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M12 3L21 8V16L12 21L3 16V8L12 3Z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                        <path d="M16.5 10.5L7.5 15.5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                        <path d="M7.5 8.5L16.5 13.5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                        <path d="M12 3V21" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h3 className="text-2xl font-bold" style={{color: darkMode ? "#F9F8F6" : "#000"}}>
+                                        Libraries & Frameworks
+                                    </h3>
+                                    <div className="h-[2px] w-40 bg-gradient-to-r from-[#9C27B0]/80 to-transparent mt-1"></div>
+                                </div>
+                            </div>
+                            
+                            <div className="relative">
+                                {/* Subtle background decorative elements */}
+                                <div className="absolute -top-10 -left-10 w-40 h-40 rounded-full bg-gradient-to-br from-purple-500/5 to-transparent blur-3xl"></div>
+                                <div className="absolute -bottom-10 -right-10 w-40 h-40 rounded-full bg-gradient-to-br from-purple-500/5 to-transparent blur-3xl"></div>
+                                
+                                {/* Grid with your existing components */}
+                                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-y-10 gap-x-6 relative z-10">
+                                    <TechIcon 
+                                        name="Spring" 
+                                        color={darkMode ? "#6DB33F" : "#6DB33F"} 
+                                        className="transform hover:-translate-y-2 hover:scale-110 transition-all duration-300"
+                                    />
+                                    <div 
+                                        className="tech-icon flex flex-col items-center justify-center transform hover:-translate-y-2 hover:scale-110 transition-all duration-300"
+                                        onMouseEnter={(e) => e.currentTarget.querySelector('img').classList.add('scale-110')}
+                                        onMouseLeave={(e) => e.currentTarget.querySelector('img').classList.remove('scale-110')}
+                                    >
+                                        <div className="relative flex items-center justify-center rounded-full overflow-hidden transition-all duration-300 ease-in-out" style={{ width: "50px", height: "50px" }}>
+                                            <img 
+                                                src="/tech-stack/spring-boot.svg" 
+                                                alt="Spring Boot" 
+                                                className="w-[35px] h-[35px] transition-all duration-300 animate-fadeIn"
+                                            />
+                                        </div>
+                                        <span className="mt-2 text-sm font-medium opacity-70 transition-all duration-300" style={{ color: darkMode ? "#6DB33F" : "#6DB33F" }}>
+                                            Spring Boot
+                                        </span>
+                                    </div>
+                                    <TechIcon 
+                                        name="Flask" 
+                                        color={darkMode ? "#FFFFFF" : "#000000"} 
+                                        className="transform hover:-translate-y-2 hover:scale-110 transition-all duration-300"
+                                    />
+                                    <div 
+                                        className="tech-icon flex flex-col items-center justify-center transform hover:-translate-y-2 hover:scale-110 transition-all duration-300"
+                                        onMouseEnter={(e) => e.currentTarget.querySelector('img').classList.add('scale-110')}
+                                        onMouseLeave={(e) => e.currentTarget.querySelector('img').classList.remove('scale-110')}
+                                    >
+                                        <div className="relative flex items-center justify-center rounded-full overflow-hidden transition-all duration-300 ease-in-out" style={{ width: "50px", height: "50px" }}>
+                                            <img 
+                                                src="/tech-stack/dotnet.svg" 
+                                                alt=".NET" 
+                                                className="w-[35px] h-[35px] transition-all duration-300 animate-fadeIn"
+                                            />
+                                        </div>
+                                        <span className="mt-2 text-sm font-medium opacity-70 transition-all duration-300" style={{ color: darkMode ? "#512BD4" : "#5C2D91" }}>
+                                            .NET
+                                        </span>
+                                    </div>
+                                    <TechIcon 
+                                        name="React" 
+                                        color={darkMode ? "#61DAFB" : "#149ECA"} 
+                                        className="transform hover:-translate-y-2 hover:scale-110 transition-all duration-300"
+                                    />
+                                    <div 
+                                        className="tech-icon flex flex-col items-center justify-center transform hover:-translate-y-2 hover:scale-110 transition-all duration-300"
+                                        onMouseEnter={(e) => e.currentTarget.querySelector('img').classList.add('scale-110')}
+                                        onMouseLeave={(e) => e.currentTarget.querySelector('img').classList.remove('scale-110')}
+                                    >
+                                        <div className="relative flex items-center justify-center rounded-full overflow-hidden transition-all duration-300 ease-in-out" style={{ width: "50px", height: "50px" }}>
+                                            <img 
+                                                src="/tech-stack/react-native.svg" 
+                                                alt="React Native" 
+                                                className="w-[35px] h-[35px] transition-all duration-300 animate-fadeIn"
+                                            />
+                                        </div>
+                                        <span className="mt-2 text-sm font-medium opacity-70 transition-all duration-300" style={{ color: darkMode ? "#61DAFB" : "#149ECA" }}>
+                                            React Native
+                                        </span>
+                                    </div>
+                                    <TechIcon 
+                                        name="NextJS" 
+                                        color={darkMode ? "#FFFFFF" : "#000000"} 
+                                        className="transform hover:-translate-y-2 hover:scale-110 transition-all duration-300"
+                                    />
+                                    <TechIcon 
+                                        name="Laravel" 
+                                        color={darkMode ? "#FF2D20" : "#FF2D20"} 
+                                        className="transform hover:-translate-y-2 hover:scale-110 transition-all duration-300"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                        
+                        {/* Databases - Enhanced styling */}
+                        <div className="tech-category w-full mb-16">
+                            <div className="category-header mb-8 flex items-center">
+                                <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#2196F3] to-[#03A9F4] flex items-center justify-center shadow-lg shadow-blue-500/20 mr-4 rotate-2">
+                                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M12 5C16.4183 5 20 4.32843 20 3.5C20 2.67157 16.4183 2 12 2C7.58172 2 4 2.67157 4 3.5C4 4.32843 7.58172 5 12 5Z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                        <path d="M20 3.5V20.5C20 21.3284 16.4183 22 12 22C7.58172 22 4 21.3284 4 20.5V3.5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                        <path d="M20 12C20 12.8284 16.4183 13.5 12 13.5C7.58172 13.5 4 12.8284 4 12" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h3 className="text-2xl font-bold" style={{color: darkMode ? "#F9F8F6" : "#000"}}>
+                                        Databases
+                                    </h3>
+                                    <div className="h-[2px] w-28 bg-gradient-to-r from-[#2196F3]/80 to-transparent mt-1"></div>
+                                </div>
+                            </div>
+                            
+                            {/* Enhanced wrapper with highlights */}
                             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-6">
-                                <TechIcon 
-                                    name="PostgreSQL" 
-                                    color={darkMode ? "#336791" : "#0064a5"} 
-                                    className="transform hover:-translate-y-2 hover:scale-110 transition-all duration-300"
-                                />
-                                <TechIcon 
-                                    name="MySQL" 
-                                    color={darkMode ? "#005571" : "#005571"} 
-                                    className="transform hover:-translate-y-2 hover:scale-110 transition-all duration-300"
-                                />
-                                <TechIcon 
-                                    name="MongoDB" 
-                                    color={darkMode ? "#47A248" : "#13AA52"} 
-                                    className="transform hover:-translate-y-2 hover:scale-110 transition-all duration-300"
-                                />
-                                <TechIcon 
-                                    name="Firebase" 
-                                    color={darkMode ? "#FFCA28" : "#FFA000"} 
-                                    className="transform hover:-translate-y-2 hover:scale-110 transition-all duration-300"
-                                />
-                                <TechIcon 
-                                    name="Oracle" 
-                                    color={darkMode ? "#F80000" : "#F80000"} 
-                                    className="transform hover:-translate-y-2 hover:scale-110 transition-all duration-300"
-                                />
-                                <TechIcon 
-                                    name="Elasticsearch" 
-                                    color={darkMode ? "#005571" : "#005571"} 
-                                    className="transform hover:-translate-y-2 hover:scale-110 transition-all duration-300"
-                                />
-                            </div>
-                        </div>
-                    </div>
-                    
-                    {/* DevOps & Cloud - Enhanced styling */}
-                    <div className="tech-category w-full mb-16">
-                        <div className="category-header mb-8 flex items-center">
-                            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#9C27B0] to-[#673AB7] flex items-center justify-center shadow-lg shadow-purple-500/20 mr-4 -rotate-2">
-                                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M12 4C10.3431 4 9 5.34315 9 7C9 8.65685 10.3431 10 12 10C13.6569 10 15 8.65685 15 7C15 5.34315 13.6569 4 12 4Z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                    <path d="M4 12C4 10.3431 5.34315 9 7 9H17C18.6569 9 20 10.3431 20 12V20C20 21.6569 18.6569 23 17 23H7C5.34315 23 4 21.6569 4 20V12Z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                </svg>
-                            </div>
-                            <div>
-                                <h3 className="text-2xl font-bold" style={{color: darkMode ? "#F9F8F6" : "#000"}}>
-                                    DevOps & Cloud Services
-                                </h3>
-                                <div className="h-[2px] w-48 bg-gradient-to-r from-[#9C27B0]/80 to-transparent mt-1"></div>
-                            </div>
+                                    <TechIcon 
+                                        name="PostgreSQL" 
+                                        color={darkMode ? "#336791" : "#0064a5"} 
+                                        className="transform hover:-translate-y-2 hover:scale-110 transition-all duration-300"
+                                    />
+                                    <TechIcon 
+                                        name="MySQL" 
+                                        color={darkMode ? "#005571" : "#005571"} 
+                                        className="transform hover:-translate-y-2 hover:scale-110 transition-all duration-300"
+                                    />
+                                    <TechIcon 
+                                        name="MongoDB" 
+                                        color={darkMode ? "#47A248" : "#13AA52"} 
+                                        className="transform hover:-translate-y-2 hover:scale-110 transition-all duration-300"
+                                    />
+                                    <TechIcon 
+                                        name="Firebase" 
+                                        color={darkMode ? "#FFCA28" : "#FFA000"} 
+                                        className="transform hover:-translate-y-2 hover:scale-110 transition-all duration-300"
+                                    />
+                                    <TechIcon 
+                                        name="Oracle" 
+                                        color={darkMode ? "#F80000" : "#F80000"} 
+                                        className="transform hover:-translate-y-2 hover:scale-110 transition-all duration-300"
+                                    />
+                                    <TechIcon 
+                                        name="Elasticsearch" 
+                                        color={darkMode ? "#005571" : "#005571"} 
+                                        className="transform hover:-translate-y-2 hover:scale-110 transition-all duration-300"
+                                    />
+                                </div>
                         </div>
                         
-                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-y-8 gap-x-4">
-                            <TechIcon 
-                                name="git" 
-                                color={darkMode ? "#F05032" : "#F05032"} 
-                                className="transform hover:scale-110 transition-all duration-300"
-                            />
-                            <div 
-                                className="tech-icon flex flex-col items-center justify-center transform hover:scale-110 transition-all duration-300"
-                                onMouseEnter={(e) => e.currentTarget.querySelector('img').classList.add('scale-110')}
-                                onMouseLeave={(e) => e.currentTarget.querySelector('img').classList.remove('scale-110')}
-                            >
-                                <div className="relative flex items-center justify-center rounded-full overflow-hidden transition-all duration-300 ease-in-out" style={{ width: "50px", height: "50px" }}>
-                                    <img 
-                                        src="/tech-stack/gitlab.svg" 
-                                        alt="GitLab CI" 
-                                        className="w-[35px] h-[35px] transition-all duration-300 animate-fadeIn"
-                                    />
+                        {/* DevOps & Cloud - Enhanced styling */}
+                        <div className="tech-category w-full mb-16">
+                            <div className="category-header mb-8 flex items-center">
+                                <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#9C27B0] to-[#673AB7] flex items-center justify-center shadow-lg shadow-purple-500/20 mr-4 -rotate-2">
+                                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M12 4C10.3431 4 9 5.34315 9 7C9 8.65685 10.3431 10 12 10C13.6569 10 15 8.65685 15 7C15 5.34315 13.6569 4 12 4Z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                        <path d="M4 12C4 10.3431 5.34315 9 7 9H17C18.6569 9 20 10.3431 20 12V20C20 21.6569 18.6569 23 17 23H7C5.34315 23 4 21.6569 4 20V12Z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                    </svg>
                                 </div>
-                                <span className="mt-2 text-sm font-medium opacity-70 transition-all duration-300" style={{ color: darkMode ? "#FC6D26" : "#FC6D26" }}>
-                                    GitLab CI
-                                </span>
-                            </div>
-                            <TechIcon 
-                                name="docker" 
-                                color={darkMode ? "#4285F4" : "#4285F4"} 
-                                className="transform hover:scale-110 transition-all duration-300"
-                            />
-                            <TechIcon 
-                                name="kubernetes" 
-                                color={darkMode ? "#326CE5" : "#326CE5"} 
-                                className="transform hover:scale-110 transition-all duration-300"
-                            />
-                            <div 
-                                className="tech-icon flex flex-col items-center justify-center transform hover:scale-110 transition-all duration-300"
-                                onMouseEnter={(e) => e.currentTarget.querySelector('img').classList.add('scale-110')}
-                                onMouseLeave={(e) => e.currentTarget.querySelector('img').classList.remove('scale-110')}
-                            >
-                                <div className="relative flex items-center justify-center rounded-full overflow-hidden transition-all duration-300 ease-in-out" style={{ width: "50px", height: "50px" }}>
-                                    <img 
-                                        src="/tech-stack/terraform.svg" 
-                                        alt="Terraform" 
-                                        className="w-[35px] h-[35px] transition-all duration-300 animate-fadeIn"
-                                    />
+                                <div>
+                                    <h3 className="text-2xl font-bold" style={{color: darkMode ? "#F9F8F6" : "#000"}}>
+                                        DevOps & Cloud Services
+                                    </h3>
+                                    <div className="h-[2px] w-48 bg-gradient-to-r from-[#9C27B0]/80 to-transparent mt-1"></div>
                                 </div>
-                                <span className="mt-2 text-sm font-medium opacity-70 transition-all duration-300" style={{ color: darkMode ? "#7B42BC" : "#5C4EE5" }}>
-                                    Terraform
-                                </span>
                             </div>
-                            <div 
-                                className="tech-icon flex flex-col items-center justify-center transform hover:scale-110 transition-all duration-300"
-                                onMouseEnter={(e) => e.currentTarget.querySelector('img').classList.add('scale-110')}
-                                onMouseLeave={(e) => e.currentTarget.querySelector('img').classList.remove('scale-110')}
-                            >
-                                <div className="relative flex items-center justify-center rounded-full overflow-hidden transition-all duration-300 ease-in-out" style={{ width: "50px", height: "50px" }}>
-                                    <img 
-                                        src="/tech-stack/jenkins.svg" 
-                                        alt="Jenkins" 
-                                        className="w-[35px] h-[35px] transition-all duration-300 animate-fadeIn"
-                                    />
+                            
+                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-y-8 gap-x-4">
+                                <TechIcon 
+                                    name="git" 
+                                    color={darkMode ? "#F05032" : "#F05032"} 
+                                    className="transform hover:scale-110 transition-all duration-300"
+                                />
+                                <div 
+                                    className="tech-icon flex flex-col items-center justify-center transform hover:scale-110 transition-all duration-300"
+                                    onMouseEnter={(e) => e.currentTarget.querySelector('img').classList.add('scale-110')}
+                                    onMouseLeave={(e) => e.currentTarget.querySelector('img').classList.remove('scale-110')}
+                                >
+                                    <div className="relative flex items-center justify-center rounded-full overflow-hidden transition-all duration-300 ease-in-out" style={{ width: "50px", height: "50px" }}>
+                                        <img 
+                                            src="/tech-stack/gitlab.svg" 
+                                            alt="GitLab CI" 
+                                            className="w-[35px] h-[35px] transition-all duration-300 animate-fadeIn"
+                                        />
+                                    </div>
+                                    <span className="mt-2 text-sm font-medium opacity-70 transition-all duration-300" style={{ color: darkMode ? "#FC6D26" : "#FC6D26" }}>
+                                        GitLab CI
+                                    </span>
                                 </div>
-                                <span className="mt-2 text-sm font-medium opacity-70 transition-all duration-300" style={{ color: darkMode ? "#D24939" : "#D24939" }}>
-                                    Jenkins
-                                </span>
+                                <TechIcon 
+                                    name="docker" 
+                                    color={darkMode ? "#4285F4" : "#4285F4"} 
+                                    className="transform hover:scale-110 transition-all duration-300"
+                                />
+                                <TechIcon 
+                                    name="kubernetes" 
+                                    color={darkMode ? "#326CE5" : "#326CE5"} 
+                                    className="transform hover:scale-110 transition-all duration-300"
+                                />
+                                <div 
+                                    className="tech-icon flex flex-col items-center justify-center transform hover:scale-110 transition-all duration-300"
+                                    onMouseEnter={(e) => e.currentTarget.querySelector('img').classList.add('scale-110')}
+                                    onMouseLeave={(e) => e.currentTarget.querySelector('img').classList.remove('scale-110')}
+                                >
+                                    <div className="relative flex items-center justify-center rounded-full overflow-hidden transition-all duration-300 ease-in-out" style={{ width: "50px", height: "50px" }}>
+                                        <img 
+                                            src="/tech-stack/terraform.svg" 
+                                            alt="Terraform" 
+                                            className="w-[35px] h-[35px] transition-all duration-300 animate-fadeIn"
+                                        />
+                                    </div>
+                                    <span className="mt-2 text-sm font-medium opacity-70 transition-all duration-300" style={{ color: darkMode ? "#7B42BC" : "#5C4EE5" }}>
+                                        Terraform
+                                    </span>
+                                </div>
+                                <div 
+                                    className="tech-icon flex flex-col items-center justify-center transform hover:scale-110 transition-all duration-300"
+                                    onMouseEnter={(e) => e.currentTarget.querySelector('img').classList.add('scale-110')}
+                                    onMouseLeave={(e) => e.currentTarget.querySelector('img').classList.remove('scale-110')}
+                                >
+                                    <div className="relative flex items-center justify-center rounded-full overflow-hidden transition-all duration-300 ease-in-out" style={{ width: "50px", height: "50px" }}>
+                                        <img 
+                                            src="/tech-stack/jenkins.svg" 
+                                            alt="Jenkins" 
+                                            className="w-[35px] h-[35px] transition-all duration-300 animate-fadeIn"
+                                        />
+                                    </div>
+                                    <span className="mt-2 text-sm font-medium opacity-70 transition-all duration-300" style={{ color: darkMode ? "#D24939" : "#D24939" }}>
+                                        Jenkins
+                                    </span>
+                                </div>
+                                <TechIcon 
+                                    name="AWS" 
+                                    color={darkMode ? "#FF9900" : "#FF9900"} 
+                                    className="transform hover:scale-110 transition-all duration-300"
+                                />
                             </div>
-                            <TechIcon 
-                                name="AWS" 
-                                color={darkMode ? "#FF9900" : "#FF9900"} 
-                                className="transform hover:scale-110 transition-all duration-300"
-                            />
                         </div>
                     </div>
-                </div>
-            </section>
+                </section>
 
 
             {/* PROJECTS SECTION */}
             <section className="projects w-full m-auto max-w-[1160px] px-[40px]" id="projects">
                 <div className="projects-content mt-[6em] flex flex-col items-center w-full">
-                    <p className="projects-title text-[1.2rem] font-light tracking-[1px] uppercase opacity-50 mb-[4em]" style={{
-                        color: darkMode ? "#F9F8F6" : "#000"
-                    }}>Selected Work</p>
+                    <div className="section-header relative mb-16 flex flex-col items-center">
+                        <span className="absolute -top-8 opacity-5 text-[5rem] font-bold tracking-wider blur-sm">
+                            PROJECTS
+                        </span>
+                        <p className="projects-title text-[1.2rem] font-light tracking-[1px] uppercase relative z-10 before:absolute before:w-12 before:h-[3px] before:bg-gradient-to-r before:from-[#6c72cb] before:to-[#cb69c1] before:-bottom-4 before:left-1/2 before:-translate-x-1/2" style={{
+                            color: darkMode ? "#F9F8F6" : "#000"
+                        }}>Selected Work</p>
+                    </div>
                     
-                    <div className="project-cards min-h-[400px] w-full flex flex-col">
+                    <div className="project-cards min-h-[400px] w-full flex flex-col space-y-12">
+                        {/* MoroccoGuide-AI Project */}
                         <div className="transform-gpu translate-y-0 scale-100 opacity-100">
-                            <a target="_blank" href="#" className="card w-full mb-[1.5em] border-b relative flex items-end group overflow-hidden" style={{
+                            <a target="_blank" href="https://moroccoguideai.vercel.app" className="card w-full h-[250px] border-b relative flex flex-col md:flex-row md:items-center group overflow-hidden" style={{
                                 borderColor: darkMode ? "#F9F8F6" : "#000",
                                 borderWidth: darkMode ? "2px" : "1px"
                             }}>
+                                
                                 {/* Animated background gradient */}
                                 <div className="absolute inset-0 bg-gradient-to-r from-[#6c72cb]/0 via-[#9c79e0]/0 to-[#cb69c1]/0 group-hover:from-[#6c72cb]/5 group-hover:via-[#9c79e0]/5 group-hover:to-[#cb69c1]/5 transition-all duration-500 ease-out opacity-0 group-hover:opacity-100"></div>
                                 
                                 {/* Animated line indicator */}
                                 <div className="absolute bottom-0 left-0 w-0 h-[3px] bg-gradient-to-r from-[#6c72cb] to-[#cb69c1] group-hover:w-full transition-all duration-700 ease-in-out"></div>
                                 
-                                <div className="card-text w-full text-black flex flex-col justify-end items-start pb-[1em] pl-0 group-hover:pl-[1em] transition-all duration-300 ease-out">
-                                    <p className="description text-[0.8rem] relative left-[8px] top-[15px] font-light tracking-[1px] uppercase mb-[0.4em] opacity-70 group-hover:opacity-100 transition-opacity duration-300"
-                                       style={{ color: darkMode ? "#F9F8F6" : "#000" }}>React Utility Library</p>
-                                    <h2 className="title tracking-[-1px] text-[6rem] font-medium transform group-hover:translate-x-2 transition-transform duration-500 ease-out"
-                                        style={{ color: darkMode ? "#F9F8F6" : "#000" }}>Haiku</h2>
-                                </div>
-                                
-                                {/* Arrow indicator */}
-                                <div className="absolute right-4 bottom-[40px] opacity-0 transform translate-x-8 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-500 ease-out">
-                                    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke={darkMode ? "#F9F8F6" : "#000"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                    </svg>
+                                <div className="card-text w-full h-full flex flex-col justify-between py-8 px-4 md:px-8 group-hover:translate-x-3 transition-all duration-500 ease-out">
+                                    <div className="flex justify-between items-start">
+                                        <div className="flex flex-col">
+                                            <p className="text-[0.7rem] uppercase tracking-[2px] mb-1 opacity-70 transition-opacity duration-300"
+                                            style={{ color: darkMode ? "#F9F8F6" : "#000" }}>Intelligent Travel Assistant</p>
+                                            <h2 className="title tracking-tight text-[2.5rem] md:text-[3rem] font-medium mb-3"
+                                                style={{ color: darkMode ? "#F9F8F6" : "#000" }}>MoroccoGuide-AI</h2>
+                                            
+                                            <p className="max-w-[550px] text-sm opacity-70 line-clamp-2 md:line-clamp-3" 
+                                            style={{ color: darkMode ? "#F9F8F6" : "#000" }}>
+                                                Personalized Morocco travel itineraries with AI-generated day plans, accommodations, cuisine recommendations and cultural insights.
+                                            </p>
+                                        </div>
+                                        
+                                        {/* Status badge */}
+                                        <div className="hidden md:block">
+                                            <span className="text-xs px-3 py-1 bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300 rounded-full font-medium border border-green-200 dark:border-green-800/30">
+                                                Completed
+                                            </span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="flex items-center justify-between mt-4">
+                                        <div className="flex flex-wrap gap-2">
+                                            <span className="px-2.5 py-1 bg-gradient-to-r from-blue-500/10 to-blue-500/5 text-blue-600 dark:text-blue-400 text-xs font-medium rounded-md border border-blue-500/10">
+                                                React
+                                            </span>
+                                            <span className="px-2.5 py-1 bg-gradient-to-r from-green-500/10 to-green-500/5 text-green-600 dark:text-green-400 text-xs font-medium rounded-md border border-green-500/10">
+                                                Node.js
+                                            </span>
+                                            <span className="px-2.5 py-1 bg-gradient-to-r from-purple-500/10 to-purple-500/5 text-purple-600 dark:text-purple-400 text-xs font-medium rounded-md border border-purple-500/10">
+                                                Gemini API
+                                            </span>
+                                        </div>
+                                        
+                                        {/* Links with icons */}
+                                        <div className="flex items-center gap-4">
+                                            <a href="https://github.com/faiz-oussama/MoroccoGuide-AI" target="_blank" rel="noopener noreferrer" className="opacity-60 hover:opacity-100 transition-opacity duration-300">
+                                                <svg width="20" height="20" fill={darkMode ? "#F9F8F6" : "#000"} viewBox="0 0 24 24">
+                                                    <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                                                </svg>
+                                            </a>
+                                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke={darkMode ? "#F9F8F6" : "#000"} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                                            </svg>
+                                        </div>
+                                    </div>
                                 </div>
                             </a>
                         </div>
                         
+                        {/* LogFlow Analytics Project */}
                         <div className="transform-gpu translate-y-0 scale-100 opacity-100">
-                            <a target="_blank" href="#" className="card w-full mb-[1.5em] border-b relative flex items-end group overflow-hidden" style={{
+                            <a target="_blank" href="https://logflow-analytics.dev" className="card w-full h-[250px] border-b relative flex flex-col md:flex-row md:items-center group overflow-hidden" style={{
                                 borderColor: darkMode ? "#F9F8F6" : "#000",
                                 borderWidth: darkMode ? "2px" : "1px"
                             }}>
+                                
                                 {/* Animated background gradient */}
                                 <div className="absolute inset-0 bg-gradient-to-r from-[#6c72cb]/0 via-[#9c79e0]/0 to-[#cb69c1]/0 group-hover:from-[#6c72cb]/5 group-hover:via-[#9c79e0]/5 group-hover:to-[#cb69c1]/5 transition-all duration-500 ease-out opacity-0 group-hover:opacity-100"></div>
                                 
                                 {/* Animated line indicator */}
                                 <div className="absolute bottom-0 left-0 w-0 h-[3px] bg-gradient-to-r from-[#6c72cb] to-[#cb69c1] group-hover:w-full transition-all duration-700 ease-in-out"></div>
                                 
-                                <div className="card-text w-full text-black flex flex-col justify-end items-start pb-[1em] pl-0 group-hover:pl-[1em] transition-all duration-300 ease-out">
-                                    <p className="description text-[0.8rem] relative left-[8px] top-[15px] font-light tracking-[1px] uppercase mb-[0.4em] opacity-70 group-hover:opacity-100 transition-opacity duration-300"
-                                       style={{ color: darkMode ? "#F9F8F6" : "#000" }}>Animated UI Components</p>
-                                    <h2 className="title tracking-[-1px] text-[6rem] font-medium transform group-hover:translate-x-2 transition-transform duration-500 ease-out"
-                                        style={{ color: darkMode ? "#F9F8F6" : "#000" }}>React Bits</h2>
-                                </div>
-                                
-                                {/* Arrow indicator */}
-                                <div className="absolute right-4 bottom-[40px] opacity-0 transform translate-x-8 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-500 ease-out">
-                                    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke={darkMode ? "#F9F8F6" : "#000"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                    </svg>
+                                <div className="card-text w-full h-full flex flex-col justify-between py-8 px-4 md:px-8 group-hover:translate-x-3 transition-all duration-500 ease-out">
+                                    <div className="flex justify-between items-start">
+                                        <div className="flex flex-col">
+                                            <p className="text-[0.7rem] uppercase tracking-[2px] mb-1 opacity-70 transition-opacity duration-300"
+                                            style={{ color: darkMode ? "#F9F8F6" : "#000" }}>Enterprise Log Analysis Platform</p>
+                                            <h2 className="title tracking-tight text-[2.5rem] md:text-[3rem] font-medium mb-3"
+                                                style={{ color: darkMode ? "#F9F8F6" : "#000" }}>LogFlow Analytics</h2>
+                                            
+                                            <p className="max-w-[550px] text-sm opacity-70 line-clamp-2 md:line-clamp-3" 
+                                            style={{ color: darkMode ? "#F9F8F6" : "#000" }}>
+                                                Enterprise-grade log streaming platform with real-time analytics, anomaly detection, and AI-powered insights for system monitoring.
+                                            </p>
+                                        </div>
+                                        
+                                        {/* Status badge */}
+                                        <div className="hidden md:block">
+                                            <span className="text-xs px-3 py-1 bg-yellow-100 text-green-800 dark:bg-green-900/30 dark:text-green-300 rounded-full font-medium border border-yellow-200 dark:border-yellow-800/30">
+                                                Completed
+                                            </span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="flex items-center justify-between mt-4">
+                                        <div className="flex flex-wrap gap-2">
+                                            <span className="px-2.5 py-1 bg-gradient-to-r from-red-500/10 to-red-500/5 text-red-600 dark:text-red-400 text-xs font-medium rounded-md border border-red-500/10">
+                                                Java
+                                            </span>
+                                            <span className="px-2.5 py-1 bg-gradient-to-r from-green-500/10 to-green-500/5 text-green-600 dark:text-green-400 text-xs font-medium rounded-md border border-green-500/10">
+                                                JavaFX
+                                            </span>
+                                            <span className="px-2.5 py-1 bg-gradient-to-r from-yellow-500/10 to-yellow-500/5 text-yellow-600 dark:text-yellow-400 text-xs font-medium rounded-md border border-yellow-500/10">
+                                                ELK Stack
+                                            </span>
+                                            <span className="px-2.5 py-1 bg-gradient-to-r from-red-900/10 to-red-800/5 text-red-800 dark:text-red-500 text-xs font-medium rounded-md border border-red-800/10">
+                                                Kafka
+                                            </span>
+                                        </div>
+                                        
+                                        {/* Links with icons */}
+                                        <div className="flex items-center gap-4">
+                                            <a href="https://github.com/faiz-oussama/LogFlow-Analytics" target="_blank" rel="noopener noreferrer" className="opacity-60 hover:opacity-100 transition-opacity duration-300">
+                                                <svg width="20" height="20" fill={darkMode ? "#F9F8F6" : "#000"} viewBox="0 0 24 24">
+                                                    <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                                                </svg>
+                                            </a>
+                                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke={darkMode ? "#F9F8F6" : "#000"} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                                            </svg>
+                                        </div>
+                                    </div>
                                 </div>
                             </a>
                         </div>
                         
+                        {/* AI Visual Search Project */}
                         <div className="transform-gpu translate-y-0 scale-100 opacity-100">
-                            <a target="_blank" href="#" className="card w-full mb-[1.5em] border-b relative flex items-end group overflow-hidden" style={{
+                            <a target="_blank" href="https://github.com/faiz-oussama/AI-Powered-Visual-and-Voice-Product-Search" className="card w-full h-[250px] border-b relative flex flex-col md:flex-row md:items-center group overflow-hidden" style={{
+                                borderColor: darkMode ? "#F9F8F6" : "#000",
+                                borderWidth: darkMode ? "2px" : "1px"
+                            }}>
+                                
+                                {/* Animated background gradient */}
+                                <div className="absolute inset-0 bg-gradient-to-r from-[#6c72cb]/0 via-[#9c79e0]/0 to-[#cb69c1]/0 group-hover:from-[#6c72cb]/5 group-hover:via-[#9c79e0]/5 group-hover:to-[#cb69c1]/5 transition-all duration-500 ease-out opacity-0 group-hover:opacity-100"></div>
+                                
+                                {/* Animated line indicator */}
+                                <div className="absolute bottom-0 left-0 w-0 h-[3px] bg-gradient-to-r from-[#6c72cb] to-[#cb69c1] group-hover:w-full transition-all duration-700 ease-in-out"></div>
+                                
+                                <div className="card-text w-full h-full flex flex-col justify-between py-8 px-4 md:px-8 group-hover:translate-x-3 transition-all duration-500 ease-out">
+                                    <div className="flex justify-between items-start">
+                                        <div className="flex flex-col">
+                                            <p className="text-[0.7rem] uppercase tracking-[2px] mb-1 opacity-70 transition-opacity duration-300"
+                                            style={{ color: darkMode ? "#F9F8F6" : "#000" }}>E-commerce AI Search</p>
+                                            <h2 className="title tracking-tight text-[2.5rem] md:text-[3rem] font-medium mb-3"
+                                                style={{ color: darkMode ? "#F9F8F6" : "#000" }}>Visual Search AI</h2>
+                                            
+                                            <p className="max-w-[550px] text-sm opacity-70 line-clamp-2 md:line-clamp-3" 
+                                            style={{ color: darkMode ? "#F9F8F6" : "#000" }}>
+                                                Deep learning platform enabling users to find products through image uploads and natural voice commands with multi-modal search capabilities.
+                                            </p>
+                                        </div>
+                                        
+                                        {/* Status badge */}
+                                        <div className="hidden md:block">
+                                            <span className="text-xs px-3 py-1 bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300 rounded-full font-medium border border-green-200 dark:border-green-800/30">
+                                                Completed
+                                            </span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="flex items-center justify-between mt-4">
+                                        <div className="flex flex-wrap gap-2">
+                                            <span className="px-2.5 py-1 bg-gradient-to-r from-blue-500/10 to-blue-500/5 text-blue-600 dark:text-blue-400 text-xs font-medium rounded-md border border-blue-500/10">
+                                                Python
+                                            </span>
+                                            <span className="px-2.5 py-1 bg-gradient-to-r from-gray-500/10 to-gray-500/5 text-gray-600 dark:text-gray-400 text-xs font-medium rounded-md border border-gray-500/10">
+                                                Flask
+                                            </span>
+                                            <span className="px-2.5 py-1 bg-gradient-to-r from-orange-500/10 to-orange-500/5 text-orange-600 dark:text-orange-400 text-xs font-medium rounded-md border border-orange-500/10">
+                                                TensorFlow
+                                            </span>
+                                        </div>
+                                        
+                                        {/* Links with icons */}
+                                        <div className="flex items-center gap-4">
+                                            <a href="https://github.com/faiz-oussama/AI-Powered-Visual-and-Voice-Product-Search" target="_blank" rel="noopener noreferrer" className="opacity-60 hover:opacity-100 transition-opacity duration-300">
+                                                <svg width="20" height="20" fill={darkMode ? "#F9F8F6" : "#000"} viewBox="0 0 24 24">
+                                                    <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                                                </svg>
+                                            </a>
+                                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke={darkMode ? "#F9F8F6" : "#000"} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                                            </svg>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                        
+                        {/* GoMaps Explorer Project */}
+                        <div className="transform-gpu translate-y-0 scale-100 opacity-100">
+                            <a target="_blank" href="https://github.com/faiz-oussama/GoMaps" className="card w-full h-[250px] border-b relative flex flex-col md:flex-row md:items-center group overflow-hidden" style={{
                                 borderColor: darkMode ? "#F9F8F6" : "#000",
                                 borderWidth: darkMode ? "2px" : "1px"
                             }}>
@@ -894,25 +1116,204 @@ export default function Portfolio() {
                                 {/* Animated line indicator */}
                                 <div className="absolute bottom-0 left-0 w-0 h-[3px] bg-gradient-to-r from-[#6c72cb] to-[#cb69c1] group-hover:w-full transition-all duration-700 ease-in-out"></div>
                                 
-                                <div className="card-text w-full text-black flex flex-col justify-end items-start pb-[1em] pl-0 group-hover:pl-[1em] transition-all duration-300 ease-out">
-                                    <p className="description text-[0.8rem] relative left-[8px] top-[15px] font-light tracking-[1px] uppercase mb-[0.4em] opacity-70 group-hover:opacity-100 transition-opacity duration-300"
-                                       style={{ color: darkMode ? "#F9F8F6" : "#000" }}>Straightforward IP Tracker</p>
-                                    <h2 className="title tracking-[-1px] text-[6rem] font-medium transform group-hover:translate-x-2 transition-transform duration-500 ease-out"
-                                        style={{ color: darkMode ? "#F9F8F6" : "#000" }}>IP Wire</h2>
+                                <div className="card-text w-full h-full flex flex-col justify-between py-8 px-4 md:px-8 group-hover:translate-x-3 transition-all duration-500 ease-out">
+                                    <div className="flex justify-between items-start">
+                                        <div className="flex flex-col">
+                                            <p className="text-[0.7rem] uppercase tracking-[2px] mb-1 opacity-70 transition-opacity duration-300"
+                                            style={{ color: darkMode ? "#F9F8F6" : "#000" }}>Location Discovery Platform</p>
+                                            <h2 className="title tracking-tight text-[2.5rem] md:text-[3rem] font-medium mb-3"
+                                                style={{ color: darkMode ? "#F9F8F6" : "#000" }}>GoMaps Explorer</h2>
+                                            
+                                            <p className="max-w-[550px] text-sm opacity-70 line-clamp-2 md:line-clamp-3" 
+                                            style={{ color: darkMode ? "#F9F8F6" : "#000" }}>
+                                                Location discovery platform with intuitive interfaces for finding nearby points of interest with customizable filters, ratings, and route planning.
+                                            </p>
+                                        </div>
+                                        
+                                        {/* Status badge */}
+                                        <div className="hidden md:block">
+                                            <span className="text-xs px-3 py-1 bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300 rounded-full font-medium border border-green-200 dark:border-green-800/30">
+                                                Completed
+                                            </span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="flex items-center justify-between mt-4">
+                                        <div className="flex flex-wrap gap-2">
+                                            <span className="px-2.5 py-1 bg-gradient-to-r from-yellow-500/10 to-yellow-500/5 text-yellow-600 dark:text-yellow-400 text-xs font-medium rounded-md border border-yellow-500/10">
+                                                JavaScript
+                                            </span>
+                                            <span className="px-2.5 py-1 bg-gradient-to-r from-green-500/10 to-green-500/5 text-green-600 dark:text-green-400 text-xs font-medium rounded-md border border-green-500/10">
+                                                Leaflet.js
+                                            </span>
+                                            <span className="px-2.5 py-1 bg-gradient-to-r from-blue-500/10 to-blue-500/5 text-blue-600 dark:text-blue-400 text-xs font-medium rounded-md border border-blue-500/10">
+                                                JavaFX
+                                            </span>
+                                        </div>
+                                        
+                                        {/* Links with icons */}
+                                        <div className="flex items-center gap-4">
+                                            <a href="https://github.com/faiz-oussama/GoMaps" target="_blank" rel="noopener noreferrer" className="opacity-60 hover:opacity-100 transition-opacity duration-300">
+                                                <svg width="20" height="20" fill={darkMode ? "#F9F8F6" : "#000"} viewBox="0 0 24 24">
+                                                    <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                                                </svg>
+                                            </a>
+                                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke={darkMode ? "#F9F8F6" : "#000"} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                                            </svg>
+                                        </div>
+                                    </div>
                                 </div>
+                            </a>
+                        </div>
+                        
+                        {/* EduPortal Project */}
+                        <div className="transform-gpu translate-y-0 scale-100 opacity-100">
+                            <a target="_blank" href="https://github.com/faiz-oussama/University-Management-System" className="card w-full h-[250px] border-b relative flex flex-col md:flex-row md:items-center group overflow-hidden" style={{
+                                borderColor: darkMode ? "#F9F8F6" : "#000",
+                                borderWidth: darkMode ? "2px" : "1px"
+                            }}>
                                 
-                                {/* Arrow indicator */}
-                                <div className="absolute right-4 bottom-[40px] opacity-0 transform translate-x-8 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-500 ease-out">
-                                    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke={darkMode ? "#F9F8F6" : "#000"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                    </svg>
+                                {/* Animated background gradient */}
+                                <div className="absolute inset-0 bg-gradient-to-r from-[#6c72cb]/0 via-[#9c79e0]/0 to-[#cb69c1]/0 group-hover:from-[#6c72cb]/5 group-hover:via-[#9c79e0]/5 group-hover:to-[#cb69c1]/5 transition-all duration-500 ease-out opacity-0 group-hover:opacity-100"></div>
+                                
+                                {/* Animated line indicator */}
+                                <div className="absolute bottom-0 left-0 w-0 h-[3px] bg-gradient-to-r from-[#6c72cb] to-[#cb69c1] group-hover:w-full transition-all duration-700 ease-in-out"></div>
+                                
+                                <div className="card-text w-full h-full flex flex-col justify-between py-8 px-4 md:px-8 group-hover:translate-x-3 transition-all duration-500 ease-out">
+                                    <div className="flex justify-between items-start">
+                                        <div className="flex flex-col">
+                                            <p className="text-[0.7rem] uppercase tracking-[2px] mb-1 opacity-70 transition-opacity duration-300"
+                                            style={{ color: darkMode ? "#F9F8F6" : "#000" }}>University Management System</p>
+                                            <h2 className="title tracking-tight text-[2.5rem] md:text-[3rem] font-medium mb-3"
+                                                style={{ color: darkMode ? "#F9F8F6" : "#000" }}>EduPortal</h2>
+                                            
+                                            <p className="max-w-[550px] text-sm opacity-70 line-clamp-2 md:line-clamp-3" 
+                                            style={{ color: darkMode ? "#F9F8F6" : "#000" }}>
+                                                Comprehensive university management system with course registration, faculty management, and administrative dashboards.
+                                            </p>
+                                        </div>
+                                        
+                                        {/* Status badge */}
+                                        <div className="hidden md:block">
+                                            <span className="text-xs px-3 py-1 bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300 rounded-full font-medium border border-green-200 dark:border-green-800/30">
+                                                Completed
+                                            </span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="flex items-center justify-between mt-4">
+                                        <div className="flex flex-wrap gap-2">
+                                            <span className="px-2.5 py-1 bg-gradient-to-r from-orange-500/10 to-orange-500/5 text-orange-600 dark:text-orange-400 text-xs font-medium rounded-md border border-purple-500/10">
+                                                HTML
+                                            </span>
+                                            <span className="px-2.5 py-1 bg-gradient-to-r from-purple-500/10 to-purple-500/5 text-purple-600 dark:text-purple-400 text-xs font-medium rounded-md border border-purple-500/10">
+                                                PHP
+                                            </span>
+                                            <span className="px-2.5 py-1 bg-gradient-to-r from-blue-500/10 to-blue-500/5 text-blue-600 dark:text-blue-400 text-xs font-medium rounded-md border border-blue-500/10">
+                                                MySQL
+                                            </span>
+                                            <span className="px-2.5 py-1 bg-gradient-to-r from-yellow-500/10 to-yellow-500/5 text-yellow-600 dark:text-yellow-400 text-xs font-medium rounded-md border border-yellow-500/10">
+                                                Javascript
+                                            </span>
+                                        </div>
+                                        
+                                        {/* Links with icons */}
+                                        <div className="flex items-center gap-4">
+                                            <a target="_blank" href="https://github.com/faiz-oussama/University-Management-System" rel="noopener noreferrer" className="opacity-60 hover:opacity-100 transition-opacity duration-300">
+                                                <svg width="20" height="20" fill={darkMode ? "#F9F8F6" : "#000"} viewBox="0 0 24 24">
+                                                    <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                                                </svg>
+                                            </a>
+                                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke={darkMode ? "#F9F8F6" : "#000"} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                                            </svg>
+                                        </div>
+                                    </div>
                                 </div>
+                            </a>
+                        </div>
+                        
+                        {/* Real-time Chat App */}
+                        <div className="transform-gpu translate-y-0 scale-100 opacity-100">
+                            <a target="_blank" href="https://github.com/faiz-oussama/Chat-App-Advanced" className="card w-full h-[250px] border-b relative flex flex-col md:flex-row md:items-center group overflow-hidden" style={{
+                                borderColor: darkMode ? "#F9F8F6" : "#000",
+                                borderWidth: darkMode ? "2px" : "1px"
+                            }}>
+                                
+                                {/* Animated background gradient */}
+                                <div className="absolute inset-0 bg-gradient-to-r from-[#6c72cb]/0 via-[#9c79e0]/0 to-[#cb69c1]/0 group-hover:from-[#6c72cb]/5 group-hover:via-[#9c79e0]/5 group-hover:to-[#cb69c1]/5 transition-all duration-500 ease-out opacity-0 group-hover:opacity-100"></div>
+                                
+                                {/* Animated line indicator */}
+                                <div className="absolute bottom-0 left-0 w-0 h-[3px] bg-gradient-to-r from-[#6c72cb] to-[#cb69c1] group-hover:w-full transition-all duration-700 ease-in-out"></div>
+                                
+                                <div className="card-text w-full h-full flex flex-col justify-between py-8 px-4 md:px-8 group-hover:translate-x-3 transition-all duration-500 ease-out">
+                                    <div className="flex justify-between items-start">
+                                        <div className="flex flex-col">
+                                            <p className="text-[0.7rem] uppercase tracking-[2px] mb-1 opacity-70 transition-opacity duration-300"
+                                            style={{ color: darkMode ? "#F9F8F6" : "#000" }}>Encrypted Messaging Platform</p>
+                                            <h2 className="title tracking-tight text-[2.5rem] md:text-[3rem] font-medium mb-3"
+                                                style={{ color: darkMode ? "#F9F8F6" : "#000" }}>SecureChat</h2>
+                                            
+                                            <p className="max-w-[550px] text-sm opacity-70 line-clamp-2 md:line-clamp-3" 
+                                            style={{ color: darkMode ? "#F9F8F6" : "#000" }}>
+                                                High-performance, encrypted messaging platform with real-time communication, file sharing, and multi-device synchronization built with C++.
+                                            </p>
+                                        </div>
+                                        
+                                        {/* Status badge */}
+                                        <div className="hidden md:block">
+                                            <span className="text-xs px-3 py-1 bg-yellow-100 text-green-800 dark:bg-green-900/30 dark:text-green-300 rounded-full font-medium border border-yellow-200 dark:border-yellow-800/30">
+                                                Completed
+                                            </span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="flex items-center justify-between mt-4">
+                                        <div className="flex flex-wrap gap-2">
+                                            <span className="px-2.5 py-1 bg-gradient-to-r from-blue-500/10 to-blue-500/5 text-blue-600 dark:text-blue-400 text-xs font-medium rounded-md border border-blue-500/10">
+                                                C++
+                                            </span>
+                                            <span className="px-2.5 py-1 bg-gradient-to-r from-teal-500/10 to-teal-500/5 text-teal-600 dark:text-teal-400 text-xs font-medium rounded-md border border-teal-500/10">
+                                                Qt
+                                            </span>
+                                            <span className="px-2.5 py-1 bg-gradient-to-r from-red-500/10 to-red-500/5 text-red-600 dark:text-red-400 text-xs font-medium rounded-md border border-red-500/10">
+                                                Sockets
+                                            </span>
+                                        </div>
+                                        
+                                        {/* Links with icons */}
+                                        <div className="flex items-center gap-4">
+                                            <a target="_blank" href="https://github.com/faiz-oussama/Chat-App-Advanced" rel="noopener noreferrer" className="opacity-60 hover:opacity-100 transition-opacity duration-300">
+                                                <svg width="20" height="20" fill={darkMode ? "#F9F8F6" : "#000"} viewBox="0 0 24 24">
+                                                    <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                                                </svg>
+                                            </a>
+                                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke={darkMode ? "#F9F8F6" : "#000"} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                                            </svg>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                        
+                        {/* View All Projects Button */}
+                        <div className="w-full flex justify-center mt-12">
+                            <a target="_blank" href="https://github.com/faiz-oussama?tab=repositories" className="px-8 py-3 border-2 rounded-full group overflow-hidden relative inline-flex items-center shadow-md hover:shadow-lg transition-shadow duration-300" style={{
+                                borderColor: darkMode ? "#F9F8F6" : "#000",
+                                color: darkMode ? "#F9F8F6" : "#000",
+                            }}>
+                                <span className="absolute inset-0 bg-gradient-to-r from-[#6c72cb] to-[#cb69c1] translate-y-full group-hover:translate-y-0 transition-transform duration-500"></span>
+                                <span className="relative z-10 group-hover:text-white transition-colors duration-500 font-medium">View All Projects</span>
+                                <svg className="w-5 h-5 ml-2 relative z-10 transition-all duration-300 group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                                </svg>
                             </a>
                         </div>
                     </div>
                 </div>
             </section>
-
             {/* ABOUT SECTION */}
             <section className="about w-full m-[8em_auto] max-w-[1160px] px-[40px]" id="about">
                 <div className="section-header relative mb-16 flex flex-col items-center">
@@ -1067,14 +1468,105 @@ export default function Portfolio() {
                 </div>
             </section>
 
+            {/* Skills */}
+            <section className="w-full my-[10em] px-10 flex items-center justify-center flex-col gap-20 overflow-x-hidden" id="skills">
+            <p className="text-[1.2rem] font-light tracking-[0.5px] uppercase opacity-50" 
+                style={{ color: darkMode ? "#F9F8F6" : "#000" }}>
+                Skills & Services
+            </p>
+
+            <div className="flex flex-col gap-20 w-full">
+                {/* Web development */}
+                <div className="flex items-center justify-center">
+                <p className="text-[clamp(1.5rem,7vw,7rem)] whitespace-nowrap font-semibold tracking-[-0.05em]"
+                    style={{ color: darkMode ? "#F9F8F6" : "#000" }}>
+                    Web
+                </p>
+                <div className="video-wrapper w-0 md:w-12 lg:w-[12rem] mx-4 border-2 border-transparent rounded-[30px] overflow-hidden flex items-center justify-center transition-all duration-500 video-visible">
+                    <video preload="auto" autoPlay loop playsInline poster="https://davidhaz.com/images/web_development_placeholder.webp" className="w-full h-full object-cover rounded-[30px] transform scale-100 transition-transform duration-500">
+                    <source src="https://davidhaz.com/videos/web_develop.mp4" type="video/mp4" />
+                    </video>
+                </div>
+                <p className="text-[clamp(1.5rem,7vw,7rem)] whitespace-nowrap font-semibold tracking-[-0.05em]"
+                    style={{ color: darkMode ? "#F9F8F6" : "#000" }}>
+                    development
+                </p>
+                </div>
+
+                {/* Interface design */}
+                <div className="flex items-center justify-center">
+                <p className="text-[clamp(1.5rem,7vw,7rem)] whitespace-nowrap font-semibold tracking-[-0.05em]"
+                    style={{ color: darkMode ? "#F9F8F6" : "#000" }}>
+                    Interface
+                </p>
+                <div className="video-wrapper w-0 md:w-8 lg:w-[12rem] mx-4 border-2 border-transparent rounded-[30px] overflow-hidden flex items-center justify-center transition-all duration-500 video-visible">
+                    <video preload="auto" autoPlay loop playsInline poster="https://davidhaz.com/images/interface_design_placeholder.webp" className="w-full h-full object-cover rounded-[30px] transform scale-100 transition-transform duration-500">
+                    <source src="https://davidhaz.com/videos/interface_design.mp4" type="video/mp4" />
+                    </video>
+                </div>
+                <p className="text-[clamp(1.5rem,7vw,7rem)] whitespace-nowrap font-semibold tracking-[-0.05em]"
+                    style={{ color: darkMode ? "#F9F8F6" : "#000" }}>
+                    design
+                </p>
+                </div>
+
+                {/* 3D web experiences */}
+                <div className="flex items-center justify-center">
+                <p className="text-[clamp(1.5rem,7vw,7rem)] whitespace-nowrap font-semibold tracking-[-0.05em]"
+                    style={{ color: darkMode ? "#F9F8F6" : "#000" }}>
+                    3D web
+                </p>
+                <div className="video-wrapper w-0 md:w-8 lg:w-[12rem] mx-4 border-2 border-transparent rounded-[30px] overflow-hidden flex items-center justify-center transition-all duration-500 video-visible">
+                    <video preload="auto" autoPlay loop playsInline poster="https://davidhaz.com/images/3d_web_experiences_placeholder.webp" className="w-full h-full object-cover rounded-[30px] transform scale-100 transition-transform duration-500">
+                    <source src="https://davidhaz.com/videos/3d_web_experiences.mp4" type="video/mp4" />
+                    </video>
+                </div>
+                <p className="text-[clamp(1.5rem,7vw,7rem)] whitespace-nowrap font-semibold tracking-[-0.05em]"
+                    style={{ color: darkMode ? "#F9F8F6" : "#000" }}>
+                    experiences
+                </p>
+                </div>
+
+                {/* Creative coding */}
+                <div className="flex items-center justify-center">
+                <p className="text-[clamp(1.5rem,7vw,7rem)] whitespace-nowrap font-semibold tracking-[-0.05em]"
+                    style={{ color: darkMode ? "#F9F8F6" : "#000" }}>
+                    Creative
+                </p>
+                <div className="video-wrapper w-0 md:w-8 lg:w-[12rem] mx-4 border-2 border-transparent rounded-[30px] overflow-hidden flex items-center justify-center transition-all duration-500 video-visible">
+                    <video preload="none" autoPlay loop playsInline poster="https://davidhaz.com/images/creative_coding_placeholder.webp" className="w-full h-full object-cover rounded-[30px] transform scale-100 transition-transform duration-500">
+                    <source src="https://davidhaz.com/videos/creative_coding.mp4" type="video/mp4" />
+                    </video>
+                </div>
+                <p className="text-[clamp(1.5rem,7vw,7rem)] whitespace-nowrap font-semibold tracking-[-0.05em]"
+                    style={{ color: darkMode ? "#F9F8F6" : "#000" }}>
+                    coding
+                </p>
+                </div>
+
+                {/* Solid engineering */}
+                <div className="flex items-center justify-center">
+                <p className="text-[clamp(1.5rem,7vw,7rem)] whitespace-nowrap font-semibold tracking-[-0.05em]"
+                    style={{ color: darkMode ? "#F9F8F6" : "#000" }}>
+                    Solid
+                </p>
+                <div className="video-wrapper w-0 md:w-8 lg:w-[12rem] mx-4 border-2 border-transparent rounded-[30px] overflow-hidden flex items-center justify-center transition-all duration-500 video-visible">
+                    <video preload="auto" autoPlay loop playsInline poster="https://davidhaz.com/images/solid_engineering_placeholder.webp" className="w-full h-full object-cover rounded-[30px] transform scale-100 transition-transform duration-500">
+                    <source src="https://davidhaz.com/videos/solid_engineering.mp4" type="video/mp4" />
+                    </video>
+                </div>
+                <p className="text-[clamp(1.5rem,7vw,7rem)] whitespace-nowrap font-semibold tracking-[-0.05em]"
+                    style={{ color: darkMode ? "#F9F8F6" : "#000" }}>
+                    engineering
+                </p>
+                </div>
+            </div>
+            </section>
+
             {/* CONTACT SECTION */}
             <section className="contact-container w-full max-w-[1800px] m-[2em_auto_auto] h-auto px-[40px]" id="contact">
                 <div className="contact relative w-full overflow-x-hidden h-[700px] rounded-[30px] py-[5em] px-[6em] mb-[2em]">
-                    <div className="contact-gradient rounded-[30px] overflow-hidden h-full w-full left-0 top-0 absolute">
-                        <div className="absolute inset-0 bg-gradient-to-br from-purple-600 via-blue-500 to-teal-400 animate-gradient-x"></div>
-                        
-                        <canvas ref={contactGrainCanvasRef} className="grain absolute rounded-[30px] top-0 left-0 w-full h-full z-[1] opacity-30 mix-blend-overlay" width="904" height="895"></canvas>
-                    </div>
+                    <img src="/bg.webp" alt="Contact background" className="absolute inset-0 w-full h-full object-cover rounded-[30px]"/>
                     
                     <div className="contact-content h-full relative flex flex-col justify-between z-[2]">
                         <h2 className="text-[6rem] font-medium text-[#F9F8F6] leading-[1.05em]">

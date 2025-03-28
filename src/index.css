@@ -126,3 +126,21 @@
 .animate-pulse-wave {
   animation: pulse-wave 4s ease-in-out infinite;
 }
+  .video-wrapper {
+    transition: width 0.5s ease-in-out, border 0.5s ease-in-out;
+  }
+  
+
+  
+  @media screen and (max-width: 770px) {
+    .video-wrapper.video-visible {
+      border-width: 1px !important;
+      border-radius: 10px;
+    }
+  }
+  
+  @media screen and (max-width: 1270px) {
+    .video-wrapper {
+      border-radius: 20px;
+    }
+  }
