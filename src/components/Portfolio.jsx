@@ -11,6 +11,7 @@ import Iridescence from '../assets/iridescence';
 import RotatingText from '../assets/RotatingText';
 import TechIcon from '../assets/TechIcon';
 import { DarkModeContext } from "./DarkModeProvider";
+import ToggleButton from './ToggleButton';
 export default function Portfolio() {
     const { darkMode } = useContext(DarkModeContext);
     const grainCanvasRef = useRef(null);
@@ -18,6 +19,7 @@ export default function Portfolio() {
     const [menuOpen, setMenuOpen] = useState(false);
     const [currentStatIndex, setCurrentStatIndex] = useState(0);
     const [currentProjectIndex, setCurrentProjectIndex] = useState(0);
+    const [activeSection, setActiveSection] = useState('');
     
     // Stats and blog data
     const stats = [
@@ -79,10 +81,28 @@ export default function Portfolio() {
     ];
 
  
+    // Add a ref to store the section that was active before opening the menu
+    const menuPreviousSectionRef = useRef(null);
     
-    // Toggle mobile menu
+    // Refine the toggleMenu function to prevent scroll animation on menu close
     const toggleMenu = () => {
-        setMenuOpen(!menuOpen);
+        // Store current section before toggling menu
+        const currentSection = activeSection;
+        
+        // Toggle menu state
+        setMenuOpen(prevState => {
+            // When opening the menu
+            if (!prevState) {
+                // Store current scroll position and section in a ref
+                window.menuScrollY = window.scrollY;
+                menuPreviousSectionRef.current = currentSection;
+                return true;
+            } 
+            // When closing the menu
+            else {
+                return false;
+            }
+        });
     };
     
     useEffect(() => {
@@ -92,6 +112,352 @@ export default function Portfolio() {
     
         return () => clearInterval(timer);
     }, []);
+
+    // Update the default active section to be the top of the page instead of projects
+    useEffect(() => {
+        // Force an initial active section on component mount
+        setActiveSection('hero'); // Set to hero section instead of projects as default
+    }, []);
+
+    // Add a ref to track user navigation clicks
+    const userClickedNavigationRef = useRef(false);
+    const clickTimeoutIdRef = useRef(null);
+
+    // Fix the handleNavClick function to ensure it keeps the selected section highlighted
+    const handleNavClick = (section, event) => {
+        // Prevent default anchor behavior
+        if (event) event.preventDefault();
+        
+        // Set flag to prevent scroll handler from changing activeSection
+        userClickedNavigationRef.current = true;
+        
+        // Clear any existing timeout
+        if (clickTimeoutIdRef.current) clearTimeout(clickTimeoutIdRef.current);
+        
+        // Set active section immediately
+        setActiveSection(section);
+        
+        // Remember which section was selected by user click
+        window.lastClickedSection = section;
+        
+        // Close mobile menu immediately if open - ensure complete cleanup
+        if (menuOpen) {
+            setMenuOpen(false); // Update state first
+            
+            // Make sure body classes and styles are reset
+            document.body.classList.remove('menu-open');
+            document.body.style.top = '';
+            document.body.style.position = '';
+            document.body.style.width = '';
+            document.body.style.height = '';
+            document.body.style.overflow = '';
+            
+            // Force menu overlay to be hidden immediately
+            const menuOverlay = document.querySelector('.mobile-menu-overlay');
+            if (menuOverlay) {
+                menuOverlay.classList.remove('open');
+                menuOverlay.style.opacity = '0';
+                menuOverlay.style.visibility = 'hidden';
+            }
+            
+            // Restore scroll position
+            if (window.menuScrollY !== undefined) {
+                window.scrollTo(0, window.menuScrollY);
+                window.menuScrollY = undefined;
+            }
+        }
+        
+        // Navigate to section - do this after menu is closed
+        setTimeout(() => {
+            const targetElement = document.getElementById(section);
+            if (targetElement) {
+                const headerOffset = 100;
+                const elementPosition = targetElement.getBoundingClientRect().top;
+                const offsetPosition = elementPosition + window.scrollY - headerOffset;
+                
+                window.scrollTo({
+                    top: offsetPosition,
+                    behavior: 'smooth'
+                });
+                
+                // Keep the userClickedNavigation flag true for longer to prevent scroll handler from changing activeSection
+                clickTimeoutIdRef.current = setTimeout(() => {
+                    userClickedNavigationRef.current = false;
+                }, 2500); // Substantially increase timeout to ensure scroll completes
+            }
+        }, 10); // Very short timeout to ensure DOM updates first
+    };
+
+    // Update the scroll detection logic to respect the last clicked section
+    useEffect(() => {
+        // Find all section elements
+        const heroSection = document.getElementById('hero');
+        const projectsSection = document.getElementById('projects');
+        const aboutSection = document.getElementById('about');
+        const skillsSection = document.getElementById('skills');
+        const contactSection = document.getElementById('contact');
+        
+        // Function to determine active section based on scroll position
+        const handleScroll = () => {
+            // Skip updating activeSection if we're currently in a programmatic navigation
+            if (userClickedNavigationRef.current) return;
+            
+            // Use a smaller offset for better detection
+            const scrollPosition = window.scrollY + 100;
+            
+            // Using direct references instead of querySelectorAll for better reliability
+            let newSection = null;
+            
+            // Check each section in reverse order (bottom to top)
+            if (contactSection && scrollPosition >= contactSection.offsetTop - 200) {
+                newSection = 'contact';
+            } else if (skillsSection && scrollPosition >= skillsSection.offsetTop - 200) {
+                newSection = 'skills';
+            } else if (aboutSection && scrollPosition >= aboutSection.offsetTop - 200) {
+                newSection = 'about';
+            } else if (projectsSection && scrollPosition >= projectsSection.offsetTop - 200) {
+                newSection = 'projects';
+            } else if (scrollPosition < 300) {
+                // Default to hero if at the top, but be more specific about the scroll position
+                newSection = 'hero';
+            }
+            
+            // Update active section if it changed and we're not in the middle of a click navigation
+            if (newSection && newSection !== activeSection && !userClickedNavigationRef.current) {
+                // Special case: if we have a lastClickedSection and we're close to it in terms of scroll position,
+                // prefer to keep that section highlighted
+                if (window.lastClickedSection) {
+                    const clickedSectionElement = document.getElementById(window.lastClickedSection);
+                    if (clickedSectionElement) {
+                        const clickedSectionTop = clickedSectionElement.offsetTop;
+                        const clickedSectionBottom = clickedSectionTop + clickedSectionElement.offsetHeight;
+                        
+                        // If we're within the section or close to it (within 200px), keep it active
+                        if (Math.abs(scrollPosition - clickedSectionTop) < 200 || 
+                            (scrollPosition >= clickedSectionTop - 200 && scrollPosition <= clickedSectionBottom + 200)) {
+                            newSection = window.lastClickedSection;
+                        } else {
+                            // We've scrolled far enough from last clicked section, clear it
+                            window.lastClickedSection = null;
+                        }
+                    }
+                }
+                
+                console.log('Setting active section to:', newSection, 'at scroll position:', scrollPosition);
+                setActiveSection(newSection);
+            }
+        };
+        
+        // Add scroll event listener with throttling
+        let ticking = false;
+        const scrollListener = () => {
+            if (!ticking) {
+                window.requestAnimationFrame(() => {
+                    handleScroll();
+                    ticking = false;
+                });
+                ticking = true;
+            }
+        };
+        
+        window.addEventListener('scroll', scrollListener);
+        
+        // Initial check when component mounts but only if we're not in a user navigation
+        if (!userClickedNavigationRef.current) {
+            setTimeout(handleScroll, 500);
+        }
+        
+        return () => {
+            window.removeEventListener('scroll', scrollListener);
+            if (clickTimeoutIdRef.current) clearTimeout(clickTimeoutIdRef.current);
+        };
+    }, [activeSection]);
+
+    // Add this useEffect to handle smooth scrolling
+    useEffect(() => {
+        // Select all links with hash (#) in the href
+        const links = document.querySelectorAll('a[href^="#"]');
+        
+        const handleClick = (e) => {
+            e.preventDefault();
+            const href = e.currentTarget.getAttribute('href');
+            
+            if (!href || href === '#') return;
+            
+            const targetElement = document.getElementById(href.substring(1));
+            
+            if (targetElement) {
+                const headerOffset = 80; // Adjust based on your header height
+                const elementPosition = targetElement.getBoundingClientRect().top;
+                const offsetPosition = elementPosition + window.scrollY - headerOffset;
+                
+                window.scrollTo({
+                    top: offsetPosition,
+                    behavior: 'smooth'
+                });
+                
+                // Close mobile menu if open
+                if (menuOpen) {
+                    setMenuOpen(false);
+                }
+            }
+        };
+        
+        // Add event listener to each link
+        links.forEach(link => {
+            link.addEventListener('click', handleClick);
+        });
+        
+        // Cleanup
+        return () => {
+            links.forEach(link => {
+                link.removeEventListener('click', handleClick);
+            });
+        };
+    }, [menuOpen]);
+    
+    // Add these refs and the observer setup
+    const skillsRef = useRef(null);
+    const skillItemsRef = useRef([]);
+
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('skill-animated');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.3 });
+
+            const skillItems = document.querySelectorAll('.skill-item');
+            skillItems.forEach(item => {
+                skillItemsRef.current.push(item);
+                observer.observe(item);
+            });
+
+            return () => {
+                skillItems.forEach(item => {
+                    observer.unobserve(item);
+                });
+            };
+        }
+    }, []);
+    
+    // Add additional refs for each section
+    const heroRef = useRef(null);
+    const projectsRef = useRef(null);
+    const aboutRef = useRef(null);
+    const contactRef = useRef(null);
+
+    // Add this effect for section animations
+    useEffect(() => {
+        const sectionRefs = [heroRef, projectsRef, skillsRef, aboutRef, contactRef];
+        
+        const sectionObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('section-animated');
+                    sectionObserver.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.15, rootMargin: "-50px 0px" });
+        
+        sectionRefs.forEach(ref => {
+            if (ref.current) {
+                sectionObserver.observe(ref.current);
+            }
+        });
+        
+        return () => {
+            sectionRefs.forEach(ref => {
+                if (ref.current) {
+                    sectionObserver.unobserve(ref.current);
+                }
+            });
+        };
+    }, []);
+    
+    // Update the menu effect to better handle section preservation
+    useEffect(() => {
+        if (menuOpen) {
+            // Store current scroll position and section
+            window.menuScrollY = window.scrollY;
+            menuPreviousSectionRef.current = activeSection;
+            
+            // Add menu-open class to body
+            document.body.classList.add('menu-open');
+            document.body.style.top = `-${window.menuScrollY}px`;
+            document.body.style.position = 'fixed';
+            document.body.style.width = '100%';
+            document.body.style.height = '100vh';
+            document.body.style.overflow = 'hidden';
+            
+            // Make menu visible
+            const menuOverlay = document.querySelector('.mobile-menu-overlay');
+            if (menuOverlay) {
+                menuOverlay.classList.add('open');
+                menuOverlay.style.opacity = '1';
+                menuOverlay.style.visibility = 'visible';
+            }
+        } else {
+            // Get the section we need to restore
+            const sectionToRestore = menuPreviousSectionRef.current;
+            
+            // Remove menu-open class from body
+            document.body.classList.remove('menu-open');
+            document.body.style.top = '';
+            document.body.style.position = '';
+            document.body.style.width = '';
+            document.body.style.height = '';
+            document.body.style.overflow = '';
+            
+            // Hide menu
+            const menuOverlay = document.querySelector('.mobile-menu-overlay');
+            if (menuOverlay) {
+                menuOverlay.classList.remove('open');
+                menuOverlay.style.opacity = '0';
+                menuOverlay.style.visibility = 'hidden';
+            }
+            
+            // Restore scroll position and section
+            if (window.menuScrollY !== undefined && sectionToRestore) {
+                // Prevent scroll handler from changing the active section
+                userClickedNavigationRef.current = true;
+                
+                // Set this section as the last clicked to further protect it
+                window.lastClickedSection = sectionToRestore;
+                
+                // Restore scroll position without animation
+                window.scrollTo({
+                    top: window.menuScrollY,
+                    behavior: 'auto' // Disable smooth scrolling
+                });
+                
+                // Force active section to be the original section
+                setActiveSection(sectionToRestore);
+                
+                // Clear any existing timeout
+                if (clickTimeoutIdRef.current) {
+                    clearTimeout(clickTimeoutIdRef.current);
+                }
+                
+                // Keep the block active longer to ensure no interference
+                clickTimeoutIdRef.current = setTimeout(() => {
+                    userClickedNavigationRef.current = false;
+                }, 2000);
+                
+                // Reset the stored scroll position
+                window.menuScrollY = undefined;
+            }
+        }
+    }, [menuOpen, activeSection]); // Keep activeSection as dependency
+    
+    // Create an improved closeMenu function that preserves section
+    const closeMenu = () => {
+        setMenuOpen(false);
+    };
     
     return (
         <div className={`min-h-screen w-full`} style={{ 
@@ -102,19 +468,21 @@ export default function Portfolio() {
             <header className="header-main w-full fixed z-[99]">
                 {/* top line */}
                 <div className="top-line w-full h-[10px] fixed top-0 left-0" style={{
-                    backgroundColor: darkMode ? "#000" : "white"
+                    backgroundColor: darkMode ? "#000" : "white",
+                    transition: "background-color 0.3s ease"
                 }}></div>
                 
                 {/* header container */}
                 <div className="header-container flex items-start w-full m-auto max-w-[1800px] z-[20]">
                     {/* logo box */}
                     <div className="header-logo-box flex items-center justify-between w-auto pr-[1em] h-[80px] rounded-b-[30px] mr-[11px] relative z-[0] group" style={{
-                        backgroundColor: darkMode ? "#000" : "white"
+                        backgroundColor: darkMode ? "#000" : "white",
+                        transition: "background-color 0.3s ease"
                     }}>
                         {/* top right corner */}
                         <svg className="svg-corner corner-logo-box-two absolute top-0 -right-7.5 z-[99]" width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <g clipPath="url(#clip0_310_2)">
-                                <path d="M30 0H0V30C0 13.431 13.431 0 30 0Z" fill="white"></path>
+                                <path d="M30 0H0V30C0 13.431 13.431 0 30 0Z" fill={darkMode ? "#000" : "white"} style={{ transition: "fill 0.3s ease" }}></path>
                             </g>
                             <defs>
                                 <clipPath id="clip0_310_2">
@@ -130,7 +498,7 @@ export default function Portfolio() {
                         {/* bottom left corner */}
                         <svg className="svg-corner corner-logo-box-two absolute bottom-0 -rotate-90 z-[99]" width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <g clipPath="url(#clip0_310_2)">
-                                <path d="M30 0H0V30C0 13.431 13.431 0 30 0Z" fill="white"></path>
+                                <path d="M30 0H0V30C0 13.431 13.431 0 30 0Z" fill={darkMode ? "#000" : "white"} style={{ transition: "fill 0.3s ease" }}></path>
                             </g>
                             <defs>
                                 <clipPath id="clip0_310_2">
@@ -145,7 +513,7 @@ export default function Portfolio() {
                         {/* bottom right corner inverse */}
                         <svg className="svg-corner corner-logo-box-two absolute ml-[2em] -bottom-7 rotate-0 z-[99]" width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <g clipPath="url(#clip0_310_2)">
-                                <path d="M30 0H0V30C0 13.431 13.431 0 30 0Z" fill="white"></path>
+                                <path d="M30 0H0V30C0 13.431 13.431 0 30 0Z" fill={darkMode ? "#000" : "white"} style={{ transition: "fill 0.3s ease" }}></path>
                             </g>
                             <defs>
                                 <clipPath id="clip0_310_2">
@@ -157,7 +525,7 @@ export default function Portfolio() {
                                 </linearGradient>
                             </defs>
                         </svg>
-                        <a href="#" className="font-medium px-4 ml-[2em] relative">
+                        <a href="#" className="font-medium px-4 ml-[2em] relative overflow-hidden" style={{ width: "max-content" }}>
                             {/* Background animated shapes */}
                             <div className="absolute inset-0 opacity-5 pointer-events-none overflow-hidden">
                                 <div className="absolute w-8 h-8 rounded-full bg-gradient-to-r from-[#6c72cb] to-[#cb69c1] top-1 left-1 animate-pulse"></div>
@@ -167,12 +535,12 @@ export default function Portfolio() {
                             
                             <div className="flex flex-col justify-center items-center relative">
                                 <div className="flex items-center">
-                                    <div className="text-[1.8rem] font-bold tracking-tighter relative overflow-hidden group-hover:scale-105 transition-transform duration-500">
+                                    <div className="text-[1.8rem] font-bold tracking-tighter relative overflow-hidden">
                                         <span className={`relative z-10 ${darkMode ? 'text-white' : 'text-black'}`}>
                                             <span className="bg-gradient-to-r from-[#6c72cb] via-[#9c79e0] to-[#cb69c1] bg-clip-text text-transparent">O</span>
                                             <span>ussama</span>
                                         </span>
-                                        <div className="absolute -top-1 -left-1 w-8 h-8 opacity-20 group-hover:opacity-60 transition-opacity duration-500">
+                                        <div className="absolute -top-1 -left-1 w-8 h-8 opacity-20 group-hover:opacity-60 transition-opacity duration-500 ease-in-out">
                                             <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full animate-spin-slow">
                                                 <circle cx="50" cy="50" r="45" stroke={darkMode ? "#ffffff" : "#000000"} strokeWidth="3" />
                                                 <path d="M50 5C74.8528 5 95 25.1472 95 50" stroke={darkMode ? "#ffffff" : "#000000"} strokeWidth="2" strokeLinecap="round" />
@@ -184,7 +552,7 @@ export default function Portfolio() {
                                         <div className={`w-px h-full ${darkMode ? 'bg-gradient-to-b from-[#6c72cb] to-[#cb69c1]' : 'bg-gradient-to-b from-[#6c72cb] to-[#cb69c1]'} animate-pulse`}></div>
                                     </div>
                                     
-                                    <div className="text-[1.8rem] font-bold tracking-tighter group-hover:scale-105 transition-transform duration-500">
+                                    <div className="text-[1.8rem] font-bold tracking-tighter">
                                         <span className={`relative z-10 ${darkMode ? 'text-white' : 'text-black'}`}>
                                             <span className="bg-gradient-to-r from-[#cb69c1] via-[#9c79e0] to-[#6c72cb] bg-clip-text text-transparent">F</span>
                                             <span>aiz</span>
@@ -192,110 +560,139 @@ export default function Portfolio() {
                                     </div>
                                 </div>
                                 
-                                <div className={`text-[0.7rem] tracking-[0.3em] uppercase -mt-1 ${darkMode ? 'text-gray-400' : 'text-gray-500'} flex items-center group-hover:tracking-[0.4em] transition-all duration-500 ease-in-out`}>
-                                    <span className="w-8 h-px bg-gradient-to-r from-transparent to-current mr-2 group-hover:w-10 transition-all duration-500"></span>
+                                <div className={`text-[0.7rem] tracking-[0.3em] uppercase -mt-1 ${darkMode ? 'text-gray-400' : 'text-gray-500'} flex items-center group-hover:tracking-[0.35em] transition-all duration-500 ease-in-out`}>
+                                    <span className="w-8 h-px bg-gradient-to-r from-transparent to-current mr-2 group-hover:w-10 transition-all duration-500 ease-in-out"></span>
                                     SOFTWARE ENGINEER
-                                    <span className="w-8 h-px bg-gradient-to-r from-current to-transparent ml-2 group-hover:w-10 transition-all duration-500"></span>
+                                    <span className="w-8 h-px bg-gradient-to-r from-current to-transparent ml-2 group-hover:w-10 transition-all duration-500 ease-in-out"></span>
                                 </div>
                             </div>
                         </a>
                         
                         {/* Add subtle shine effect overlay */}
-                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-0 group-hover:opacity-10 translate-x-[-100%] group-hover:translate-x-[100%] transition-all duration-1000 pointer-events-none"></div>
+                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-0 group-hover:opacity-10 translate-x-[-100%] group-hover:translate-x-[100%] transition-all duration-1000 ease-in-out pointer-events-none"></div>
                         
                         
 
                         
-                        {/* Mobile Menu Button (only visible on mobile) */}
+                        {/* Mobile Menu Button (only visible on mobile) - Replace text with hamburger icon */}
                         <div 
-                            className="mobile-menu flex md:hidden cursor-pointer font-medium w-[80px] mr-[0.6em] h-[40px] justify-center items-center rounded-[20px] relative z-[2] group overflow-hidden" 
-                            style={{
-                                color: darkMode ? "#F9F8F6" : "#000",
-                                border: darkMode ? "1.5px solid #F9F8F6" : "1.5px solid #000"
-                            }}
+                            className={`mobile-menu-btn flex md:hidden cursor-pointer w-[45px] h-[45px] mr-[0.6em] justify-center items-center relative z-[99] ${menuOpen ? 'menu-open' : ''}`} 
                             onClick={toggleMenu}
                         >
-                            <span className="relative z-10">{menuOpen ? "Close" : "Menu"}</span>
-                            <div className="absolute inset-0 bg-gradient-to-r from-[#6c72cb] to-[#cb69c1] opacity-0 group-hover:opacity-100 transition-opacity duration-300 -translate-x-full group-hover:translate-x-0 transition-transform duration-300"></div>
-                            <svg className="svg-corner corner-menu-one absolute left-[-41px] bottom-[-22px] rotate-[180deg]" width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <g clipPath="url(#clip0_310_2)">
-                                    <path d="M30 0H0V30C0 13.431 13.431 0 30 0Z" fill="#5C54F9"></path>
-                                </g>
-                                <defs>
-                                    <clipPath id="clip0_310_2">
-                                        <rect width="30" height="30" fill="white"></rect>
-                                    </clipPath>
-                                </defs>
-                            </svg>
+                            <div className="hamburger-icon">
+                                <span className="line line-1"></span>
+                                <span className="line line-2"></span>
+                                <span className="line line-3"></span>
+                            </div>
                         </div>
                         
-                        {/* Mobile Menu Container */}
-                        <div className={`menu-container ${menuOpen ? 'flex opacity-100 translate-y-0' : 'hidden opacity-0 -translate-y-4'} flex-col p-[2em_1em] bg-gradient-to-br from-[#5C54F9] to-[#7863e8] h-[80dvh] max-h-[540px] w-full absolute top-[80px] rounded-[30px_0_30px_30px] shadow-[0_10px_20px_#00000040] text-[#F9F8F6] transition-all duration-300`}>
-                            <div className="absolute inset-0 rounded-[30px_0_30px_30px] bg-grid opacity-10"></div>
-                            <canvas ref={grainCanvasRef} className="grain absolute w-full h-full opacity-10 mix-blend-overlay rounded-[30px_0_30px_30px]"></canvas>
+                        {/* Full screen mobile menu overlay */}
+                        <div className={`mobile-menu-overlay ${menuOpen ? 'open' : ''}`}>
+                            {/* Close button in top right */}
+                            <button 
+                                className="mobile-menu-close" 
+                                onClick={closeMenu}
+                                aria-label="Close menu"
+                            >
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                </svg>
+                            </button>
                             
-                            <a href="#projects" className="mobile-link text-[2rem] w-full border-b border-[#F9F8F6] pb-[0.3em] mb-[0.3em] cursor-pointer transition-all duration-300 hover:pl-2 flex items-center group">
-                                <span className="w-0 h-0 rounded-full bg-white mr-0 group-hover:w-2 group-hover:h-2 group-hover:mr-2 transition-all duration-300"></span>
-                                Projects
-                            </a>
-                            <a href="#about" className="mobile-link text-[2rem] w-full border-b border-[#F9F8F6] pb-[0.3em] mb-[0.3em] cursor-pointer transition-all duration-300 hover:pl-2 flex items-center group">
-                                <span className="w-0 h-0 rounded-full bg-white mr-0 group-hover:w-2 group-hover:h-2 group-hover:mr-2 transition-all duration-300"></span>
-                                About
-                            </a>
-                            <a href="#skills" className="mobile-link text-[2rem] w-full border-b border-[#F9F8F6] pb-[0.3em] mb-[0.3em] cursor-pointer transition-all duration-300 hover:pl-2 flex items-center group">
-                                <span className="w-0 h-0 rounded-full bg-white mr-0 group-hover:w-2 group-hover:h-2 group-hover:mr-2 transition-all duration-300"></span>
-                                Skills
-                            </a>
-                            <a href="#contact" className="mobile-link text-[2rem] w-full border-b border-[#F9F8F6] pb-[0.3em] mb-[0.3em] cursor-pointer transition-all duration-300 hover:pl-2 flex items-center group">
-                                <span className="w-0 h-0 rounded-full bg-white mr-0 group-hover:w-2 group-hover:h-2 group-hover:mr-2 transition-all duration-300"></span>
-                                Contact
-                            </a>
-                            
-                            <div className="mobile-theme-switch absolute bottom-[1em] w-fit rounded-[50px] h-[60px] border-[1.5px] border-[#F9F8F6] flex p-[0.6em] items-center justify-center backdrop-blur-sm" style={{
-                                backgroundColor: darkMode ? "#F9F8F6" : "rgba(92, 84, 249, 0.5)"
-                            }}>
-                                <label className="container IsLight">
-                                    <input type="checkbox" />
-                                    <div></div>
-                                </label>
-                                <p className="m-0 absolute left-[calc(100%+1em)] opacity-50" style={{
-                                    color: darkMode ? "#000" : "#F9F8F6"
-                                }}>Light Mode</p>
+                            <div className="mobile-menu-content">
+                                <div className="mobile-menu-header">
+                                    <span className="mobile-menu-title">Navigation</span>
+                                </div>
+                                
+                                {/* Add Home link to mobile navigation */}
+                                <nav className="mobile-menu-nav">
+                                    <a href="#hero" className={`mobile-nav-link ${activeSection === 'hero' ? 'active' : ''}`} onClick={(e) => handleNavClick('hero', e)}>
+                                        <span className="mobile-nav-number">00</span>
+                                        <span className="mobile-nav-text">Home</span>
+                                        <span className="mobile-nav-indicator"></span>
+                                    </a>
+                                    <a href="#projects" className={`mobile-nav-link ${activeSection === 'projects' ? 'active' : ''}`} onClick={(e) => handleNavClick('projects', e)}>
+                                        <span className="mobile-nav-number">01</span>
+                                        <span className="mobile-nav-text">Projects</span>
+                                        <span className="mobile-nav-indicator"></span>
+                                    </a>
+                                    <a href="#about" className={`mobile-nav-link ${activeSection === 'about' ? 'active' : ''}`} onClick={(e) => handleNavClick('about', e)}>
+                                        <span className="mobile-nav-number">02</span>
+                                        <span className="mobile-nav-text">About</span>
+                                        <span className="mobile-nav-indicator"></span>
+                                    </a>
+                                    <a href="#skills" className={`mobile-nav-link ${activeSection === 'skills' ? 'active' : ''}`} onClick={(e) => handleNavClick('skills', e)}>
+                                        <span className="mobile-nav-number">03</span>
+                                        <span className="mobile-nav-text">Skills</span>
+                                        <span className="mobile-nav-indicator"></span>
+                                    </a>
+                                    <a href="#contact" className={`mobile-nav-link ${activeSection === 'contact' ? 'active' : ''}`} onClick={(e) => handleNavClick('contact', e)}>
+                                        <span className="mobile-nav-number">04</span>
+                                        <span className="mobile-nav-text">Contact</span>
+                                        <span className="mobile-nav-indicator"></span>
+                                    </a>
+                                </nav>
+                                
+                                <div className="mobile-menu-footer">
+                                    <div className="mobile-theme-toggle">
+                                        <ToggleButton className="mobile-dark-mode-toggle" />
+                                    </div>
+                                    
+                                    <div className="mobile-social-links">
+                                        <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="social-link">
+                                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M12 2C6.477 2 2 6.477 2 12C2 16.418 4.865 20.167 8.839 21.65C9.339 21.75 9.5 21.442 9.5 21.167C9.5 20.917 9.5 20.167 9.5 19.333C6.735 19.95 6.14 18 6.14 18C5.684 16.903 5.03 16.6 5.03 16.6C4.122 15.967 5.095 16 5.095 16C6.1 16.067 6.64 17.017 6.64 17.017C7.55 18.517 9.133 18.067 9.54 17.8C9.638 17.15 9.89 16.7 10.17 16.45C7.973 16.2 5.65 15.367 5.65 11.5C5.65 10.4 6.04 9.517 6.65 8.8C6.54 8.55 6.203 7.5 6.75 6.15C6.75 6.15 7.612 5.883 9.5 7.173C10.29 6.95 11.15 6.842 12 6.842C12.85 6.842 13.71 6.95 14.5 7.173C16.388 5.883 17.25 6.15 17.25 6.15C17.797 7.503 17.46 8.553 17.35 8.8C17.963 9.517 18.35 10.403 18.35 11.5C18.35 15.383 16.027 16.2 13.813 16.433C14.17 16.733 14.5 17.333 14.5 18.233C14.5 19.567 14.5 20.817 14.5 21.167C14.5 21.442 14.66 21.75 15.167 21.65C19.135 20.16 22 16.417 22 12C22 6.477 17.523 2 12 2Z" fill="currentColor"/>
+                                            </svg>
+                                        </a>
+                                        <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="social-link">
+                                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M19 3C19.5304 3 20.0391 3.21071 20.4142 3.58579C20.7893 3.96086 21 4.46957 21 5V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H19ZM18.5 18.5V13.2C18.5 12.3354 18.1565 11.5062 17.5452 10.8948C16.9338 10.2835 16.1046 9.94 15.24 9.94C14.39 9.94 13.4 10.46 12.92 11.24V10.13H10.13V18.5H12.92V13.57C12.92 12.8 13.54 12.17 14.31 12.17C14.6813 12.17 15.0374 12.3175 15.2999 12.5801C15.5625 12.8426 15.71 13.1987 15.71 13.57V18.5H18.5ZM6.88 8.56C7.32556 8.56 7.75288 8.383 8.06794 8.06794C8.383 7.75288 8.56 7.32556 8.56 6.88C8.56 5.95 7.81 5.19 6.88 5.19C6.43178 5.19 6.00193 5.36805 5.68499 5.68499C5.36805 6.00193 5.19 6.43178 5.19 6.88C5.19 7.81 5.95 8.56 6.88 8.56ZM8.27 18.5V10.13H5.5V18.5H8.27Z" fill="currentColor"/>
+                                            </svg>
+                                        </a>
+                                        <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="social-link">
+                                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M22.46 6C21.69 6.35 20.86 6.58 20 6.69C20.88 6.16 21.56 5.32 21.88 4.31C21.05 4.81 20.13 5.16 19.16 5.36C18.37 4.5 17.26 4 16 4C13.65 4 11.73 5.92 11.73 8.29C11.73 8.63 11.77 8.96 11.84 9.27C8.28 9.09 5.11 7.38 3 4.79C2.63 5.42 2.42 6.16 2.42 6.94C2.42 8.43 3.17 9.75 4.33 10.5C3.62 10.5 2.96 10.3 2.38 10V10.03C2.38 12.11 3.86 13.85 5.82 14.24C5.46 14.34 5.08 14.39 4.69 14.39C4.42 14.39 4.15 14.36 3.89 14.31C4.43 16 6 17.26 7.89 17.29C6.43 18.45 4.58 19.13 2.56 19.13C2.22 19.13 1.88 19.11 1.54 19.07C3.44 20.29 5.7 21 8.12 21C16 21 20.33 14.46 20.33 8.79C20.33 8.6 20.33 8.42 20.32 8.23C21.16 7.63 21.88 6.87 22.46 6Z" fill="currentColor"/>
+                                            </svg>
+                                        </a>
+                                    </div>
                             </div>
                         </div>
                     </div>
                     
                     {/* Desktop Navigation - hidden on mobile */}
-                    <div className="hidden md:block" style={{ transform: "translateX(0px)" }}>
-                        <nav className="navigation relative top-[10px] h-[58px] rounded-[50px] py-0 px-[0.5em] flex items-center justify-evenly backdrop-blur-[10px] saturate-[200%] bg-[#ffffff80] border border-[rgba(209,213,219,.5)] shadow-[0_3px_20px_-5px_#00000026]">
-                            <a href="#projects" className="text-base font-medium mx-[0.85em] leading-[1.15] transition-all duration-300 select-none relative group">
-                                <span className="relative z-10">Projects</span>
+                    <div className="hidden md:block">
+                        {/* Add Home link to desktop navigation */}
+                        <nav className="navigation relative h-[58px] rounded-[50px] py-0 px-[0.5em] flex items-center justify-evenly backdrop-blur-[10px] saturate-[200%] bg-[#ffffff80] border border-[rgba(209,213,219,.5)] shadow-[0_3px_20px_-5px_#00000026]">
+                            <a href="#hero" className="text-base font-medium mx-[0.85em] leading-[1.15] transition-all duration-300 select-none relative group" onClick={(e) => handleNavClick('hero', e)}>
+                                <span className="relative z-10 text-black">Home</span>
                                 <span className="absolute bottom-0 left-0 w-0 h-[2px] bg-gradient-to-r from-[#6c72cb] to-[#cb69c1] group-hover:w-full transition-all duration-300 rounded-full"></span>
                             </a>
-                            <a href="#about" className="text-base font-medium mx-[0.85em] leading-[1.15] transition-all duration-300 select-none relative group">
-                                <span className="relative z-10">About</span>
+                            <a href="#projects" className="text-base font-medium mx-[0.85em] leading-[1.15] transition-all duration-300 select-none relative group" onClick={(e) => handleNavClick('projects', e)}>
+                                <span className="relative z-10 text-black">Projects</span>
                                 <span className="absolute bottom-0 left-0 w-0 h-[2px] bg-gradient-to-r from-[#6c72cb] to-[#cb69c1] group-hover:w-full transition-all duration-300 rounded-full"></span>
                             </a>
-                            <a href="#skills" className="text-base font-medium mx-[0.85em] leading-[1.15] transition-all duration-300 select-none relative group">
-                                <span className="relative z-10">Skills</span>
+                            <a href="#about" className="text-base font-medium mx-[0.85em] leading-[1.15] transition-all duration-300 select-none relative group" onClick={(e) => handleNavClick('about', e)}>
+                                <span className="relative z-10 text-black">About</span>
                                 <span className="absolute bottom-0 left-0 w-0 h-[2px] bg-gradient-to-r from-[#6c72cb] to-[#cb69c1] group-hover:w-full transition-all duration-300 rounded-full"></span>
                             </a>
-                            <a href="#contact" className="text-base font-medium mx-[0.85em] mr-[2em] leading-[1.15] transition-all duration-300 select-none relative group">
-                                <span className="relative z-10">Contact</span>
+                            <a href="#skills" className="text-base font-medium mx-[0.85em] leading-[1.15] transition-all duration-300 select-none relative group" onClick={(e) => handleNavClick('skills', e)}>
+                                <span className="relative z-10 text-black">Skills</span>
+                                <span className="absolute bottom-0 left-0 w-0 h-[2px] bg-gradient-to-r from-[#6c72cb] to-[#cb69c1] group-hover:w-full transition-all duration-300 rounded-full"></span>
+                            </a>
+                            <a href="#contact" className="text-base font-medium mx-[0.85em] mr-[2em] leading-[1.15] transition-all duration-300 select-none relative group" onClick={(e) => handleNavClick('contact', e)}>
+                                <span className="relative z-10 text-black">Contact</span>
                                 <span className="absolute bottom-0 left-0 w-0 h-[2px] bg-gradient-to-r from-[#6c72cb] to-[#cb69c1] group-hover:w-full transition-all duration-300 rounded-full"></span>
                             </a>
                             
-                            <label className="container IsLight relative z-10">
-                                <input type="checkbox" />
-                                <div></div>
-                            </label>
+                            <ToggleButton className="relative" />
                         </nav>
+                        </div>
                     </div>
                 </div>
             </header>
 
             {/* HERO SECTION */}
-            <div className="hero mt-[10px] overflow-hidden">
+            <div className="hero mt-[10px] overflow-hidden" ref={heroRef} id="hero">
                 <div className="main-container w-full">
                     <div className="min-h-[630px] h-[85vh] overflow-hidden relative">
                         {/* Content area with glass panels */}
@@ -316,9 +713,9 @@ export default function Portfolio() {
                                     <canvas ref={grainCanvasRef} className="grain absolute w-full h-full z-[2] opacity-20" width="904" height="895"></canvas>
                                     
                                     {/* SVG Corner for top-left (intersection with logo) */}
-                                    <svg className="svg-corner absolute top-0 left-0 z-[5] rotate-180" width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <svg className="svg-corner absolute top-0 left-0 z-[5] rotate-90" width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
                                         <g clipPath="url(#clip0_hero_corner_tl)">
-                                            <path d="M30 0H0V30C0 13.431 13.431 0 30 0Z" fill={darkMode ? "#000" : "#fff"}></path>
+                                            <path d="M30 0H0V30C0 13.431 13.431 0 30 0Z" fill={darkMode ? "#000" : "#fff"} style={{ transition: "fill 0.3s ease" }}></path>
                                         </g>
                                         <defs>
                                             <clipPath id="clip0_hero_corner_tl">
@@ -335,10 +732,10 @@ export default function Portfolio() {
                                 <div className="mt-10 max-w-[600px] relative z-[3]">
                                     <h1 className="heading-text">
                                         <div className="overflow-hidden">
-                                            <div className="slide-up font-light text-[1.2rem] mb-2 tracking-wide opacity-70">Hello, I'm an</div>
+                                            <div className="slide-up font-light text-[1.2rem] mb-2 tracking-wide opacity-70" style={{ color: "#000000" }}>Hello, I'm an</div>
                                         </div>
                                         <div className="overflow-hidden mb-2">
-                                            <div className="slide-up text-[clamp(3rem,6vw,4.5rem)] font-semibold leading-tight">
+                                            <div className="slide-up text-[clamp(3rem,6vw,4.5rem)] font-semibold leading-tight" style={{ color: "#000000" }}>
                                                 <span>Equal Parts</span> <span className="text-gradient bg-gradient-to-r from-[#6c72cb] to-[#cb69c1] bg-clip-text text-transparent">Creative</span>
                                             </div>
                                         </div>
@@ -352,6 +749,7 @@ export default function Portfolio() {
                                                 exit={{ opacity: 0, y: -20 }}
                                                 transition={{ duration: 0.5, ease: "easeOut" }}
                                                 rotationInterval={3000}
+                                                style={{ color: "#000000 !important" }}
                                             />
                                         </div>
                                     </h1>
@@ -362,23 +760,37 @@ export default function Portfolio() {
                                         animateBy="words"
                                         direction="top"
                                         className="max-w-[500px] mt-6 text-[1.1rem] leading-relaxed opacity-75"
+                                        style={{ color: "#000000 !important" }}
                                     />
                                     
                                     <div className="mt-8 flex flex-wrap gap-4">
                                         <a href="#projects" className="btn-primary px-6 py-3 rounded-full bg-gradient-to-r from-[#6c72cb] to-[#cb69c1] text-white shadow-lg shadow-purple-500/20 font-medium">
                                             View Projects
                                         </a>
-                                        <a href="#contact" className="btn-secondary px-6 py-3 rounded-full bg-white/10 backdrop-blur-md border border-white/20 shadow-sm hover:bg-white/20 transition duration-300">
+                                        <a href="#contact" className="btn-secondary px-6 py-3 rounded-full bg-white/80 backdrop-blur-md border border-white/40 shadow-sm hover:bg-white transition duration-300 font-medium" style={{ color: "#000000 !important" }}>
                                             Contact Me
                                         </a>
                                     </div>
                                 </div>
                             </div>
                             
+                            {/* Scroll down arrow for mobile - Will only be visible on mobile */}
+                            <div className="scroll-down-arrow hidden sm:hidden">
+                                <a href="#projects" className="flex flex-col items-center">
+                                    <span className="text-sm mb-1 opacity-70">Scroll</span>
+                                    <div className="w-10 h-10 rounded-full bg-black flex items-center justify-center">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M12 5V19M12 19L5 12M12 19L19 12" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                        </svg>
+                                    </div>
+                                </a>
+                            </div>
+                            
                             {/* Right side - Stats and Blog (independent) */}
                             <div className="w-full lg:w-[27%] h-full flex flex-col gap-4 ml-[1em]">
                                 {/* Stats Component - Circular with 3D effect */}
-                                <div className="w-[310px] h-[450px] bg-black rounded-full flex flex-col items-center justify-center relative overflow-hidden shadow-xl group transition-all duration-500 hover:scale-[1.02]">                                    {/* Sophisticated background elements */}
+                                <div className="stats-card w-[310px] h-[450px] bg-black rounded-full flex flex-col items-center justify-center relative overflow-hidden shadow-xl group transition-all duration-500 hover:scale-[1.02]">
+                                    {/* Sophisticated background elements */}
                                     <div className="absolute inset-0 bg-gradient-to-br from-black to-gray-900"></div>
                                     <div className="absolute inset-0 opacity-30">
                                         <div className="absolute w-full h-full bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20"></div>
@@ -420,9 +832,9 @@ export default function Portfolio() {
                                     >
                                         {stats.map((stat, index) => (
                                             <SwiperSlide key={index}>
-                                                <div className="text-white flex flex-col items-center justify-center h-full z-10 p-7">
+                                                <div className="stats-content text-white flex flex-col items-center justify-center h-full z-10 p-7">
                                                 <motion.div 
-                                                        className="text-[5rem] font-bold leading-none bg-gradient-to-br from-white via-purple-100 to-blue-200 bg-clip-text text-transparent"
+                                                        className="stats-number text-[5rem] font-bold leading-none bg-gradient-to-br from-white via-purple-100 to-blue-200 bg-clip-text text-transparent"
                                                         initial={{ scale: 0.9, opacity: 0 }}
                                                         animate={{ scale: 1, opacity: 1 }}
                                                         exit={{ scale: 0.9, opacity: 0 }}
@@ -450,7 +862,7 @@ export default function Portfolio() {
                                                         )}
                                                     </motion.div>
                                                     <motion.div 
-                                                        className="text-gray-400 text-center text-[2em] md:text-base w-full max-w-[80%] mt-2 tracking-wide"
+                                                        className="stats-text text-gray-400 text-center text-[2em] md:text-base w-full max-w-[80%] mt-2 tracking-wide"
                                                         initial={{ y: 10, opacity: 0 }}
                                                         animate={{ y: 0, opacity: 1 }}
                                                         exit={{ y: -10, opacity: 0 }}
@@ -469,7 +881,7 @@ export default function Portfolio() {
                                 </div>
                                 
                                 {/* Blog Component - Card with modern design */}
-                                <div className="w-[320px] h-full relative transition-all duration-500 hover:scale-[1.02] rounded-3xl bottom-0 overflow-hidden">
+                                <div className="projects-card w-[320px] h-full relative transition-all duration-500 hover:scale-[1.02] rounded-3xl bottom-0 overflow-hidden">
                                 <Swiper
                                     spaceBetween={30}
                                     slidesPerView={1}
@@ -518,8 +930,11 @@ export default function Portfolio() {
                                                             ) : (
                                                                 <div className="w-16 h-16 bg-white/10 backdrop-blur-sm rounded-xl border border-white/20 flex items-center justify-center relative z-10">
                                                                     <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                                        <path d="M3 8L8 3M8 3L13 8M8 3V16" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                                                                        <path d="M16 21L11 16M16 21L21 16M16 21V8" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                                                                        <path d="M8 3L3 8L8 13" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                                                                        <path d="M16 3L21 8L16 13" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                                                                        <path d="M3 8H21" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                                                                        <path d="M3 17H21" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                                                                        <path d="M8 21L12 13L16 21" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                                                                     </svg>
                                                                 </div>
                                                             )}
@@ -697,8 +1112,7 @@ export default function Portfolio() {
                                     </div>
                                     <TechIcon 
                                         name="Flask" 
-                                        color={darkMode ? "#FFFFFF" : "#000000"} 
-                                        className="transform hover:-translate-y-2 hover:scale-110 transition-all duration-300"
+                                        className="transform hover:-translate-y-2 hover:scale-110 transition-all duration-300" style={{ filter: darkMode ? "invert(100%)" : "invert(0%)" }}
                                     />
                                     <div 
                                         className="tech-icon flex flex-col items-center justify-center transform hover:-translate-y-2 hover:scale-110 transition-all duration-300"
@@ -741,6 +1155,7 @@ export default function Portfolio() {
                                         name="NextJS" 
                                         color={darkMode ? "#FFFFFF" : "#000000"} 
                                         className="transform hover:-translate-y-2 hover:scale-110 transition-all duration-300"
+                                        style={{ filter: darkMode ? "invert(100%)" : "invert(0%)" }}
                                     />
                                     <TechIcon 
                                         name="Laravel" 
@@ -810,7 +1225,7 @@ export default function Portfolio() {
                                 <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#9C27B0] to-[#673AB7] flex items-center justify-center shadow-lg shadow-purple-500/20 mr-4 -rotate-2">
                                     <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                         <path d="M12 4C10.3431 4 9 5.34315 9 7C9 8.65685 10.3431 10 12 10C13.6569 10 15 8.65685 15 7C15 5.34315 13.6569 4 12 4Z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                        <path d="M4 12C4 10.3431 5.34315 9 7 9H17C18.6569 9 20 10.3431 20 12V20C20 21.6569 18.6569 23 17 23H7C5.34315 23 4 21.6569 4 20V12Z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                        <path d="M4 12C4 10.3431 5.34315 9 7 9H17C18.6569 9 20 10.3431 20 12V20C20 21.6569 18.6569 23 17 23H7C5.34315 23 4 21.6569 4 20V12Z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ transition: "stroke 0.3s ease" }}/>
                                     </svg>
                                 </div>
                                 <div>
@@ -863,6 +1278,7 @@ export default function Portfolio() {
                                             src="/tech-stack/terraform.svg" 
                                             alt="Terraform" 
                                             className="w-[35px] h-[35px] transition-all duration-300 animate-fadeIn"
+                                            style={{ filter: darkMode ? "invert(100%)" : "invert(0%)" }}
                                         />
                                     </div>
                                     <span className="mt-2 text-sm font-medium opacity-70 transition-all duration-300" style={{ color: darkMode ? "#7B42BC" : "#5C4EE5" }}>
@@ -897,7 +1313,7 @@ export default function Portfolio() {
 
 
             {/* PROJECTS SECTION */}
-            <section className="projects w-full m-auto max-w-[1160px] px-[40px]" id="projects">
+            <section id="projects" className="projects w-full m-auto max-w-[1160px] px-[40px]" ref={projectsRef}>
                 <div className="projects-content mt-[6em] flex flex-col items-center w-full">
                     <div className="section-header relative mb-16 flex flex-col items-center">
                         <span className="absolute -top-8 opacity-5 text-[5rem] font-bold tracking-wider blur-sm">
@@ -910,19 +1326,20 @@ export default function Portfolio() {
                     
                     <div className="project-cards min-h-[400px] w-full flex flex-col space-y-12">
                         {/* MoroccoGuide-AI Project */}
-                        <div className="transform-gpu translate-y-0 scale-100 opacity-100">
-                            <a target="_blank" href="https://moroccoguideai.vercel.app" className="card w-full h-[250px] border-b relative flex flex-col md:flex-row md:items-center group overflow-hidden" style={{
+                        <div className="transform-gpu translate-y-0 scale-100 opacity-100 transition-all duration-300">
+                            <a target="_blank" href="https://moroccoguideai.vercel.app" className="card w-full h-[250px] border-b relative flex flex-col md:flex-row md:items-center group overflow-hidden transition-all duration-500 ease-in-out" style={{
                                 borderColor: darkMode ? "#F9F8F6" : "#000",
-                                borderWidth: darkMode ? "2px" : "1px"
+                                borderWidth: darkMode ? "2px" : "1px",
+                                transition: "border-color 0.3s ease"
                             }}>
                                 
                                 {/* Animated background gradient */}
-                                <div className="absolute inset-0 bg-gradient-to-r from-[#6c72cb]/0 via-[#9c79e0]/0 to-[#cb69c1]/0 group-hover:from-[#6c72cb]/5 group-hover:via-[#9c79e0]/5 group-hover:to-[#cb69c1]/5 transition-all duration-500 ease-out opacity-0 group-hover:opacity-100"></div>
+                                <div className="absolute inset-0 bg-gradient-to-r from-[#6c72cb]/0 via-[#9c79e0]/0 to-[#cb69c1]/0 group-hover:from-[#6c72cb]/5 group-hover:via-[#9c79e0]/5 group-hover:to-[#cb69c1]/5 transition-all duration-500 ease-in-out opacity-0 group-hover:opacity-100"></div>
                                 
                                 {/* Animated line indicator */}
                                 <div className="absolute bottom-0 left-0 w-0 h-[3px] bg-gradient-to-r from-[#6c72cb] to-[#cb69c1] group-hover:w-full transition-all duration-700 ease-in-out"></div>
                                 
-                                <div className="card-text w-full h-full flex flex-col justify-between py-8 px-4 md:px-8 group-hover:translate-x-3 transition-all duration-500 ease-out">
+                                <div className="card-text w-full h-full flex flex-col justify-between py-8 px-4 md:px-8 group-hover:translate-x-2 transition-all duration-500 ease-in-out">
                                     <div className="flex justify-between items-start">
                                         <div className="flex flex-col">
                                             <p className="text-[0.7rem] uppercase tracking-[2px] mb-1 opacity-70 transition-opacity duration-300"
@@ -934,7 +1351,7 @@ export default function Portfolio() {
                                             style={{ color: darkMode ? "#F9F8F6" : "#000" }}>
                                                 Personalized Morocco travel itineraries with AI-generated day plans, accommodations, cuisine recommendations and cultural insights.
                                             </p>
-                                        </div>
+                                        </div>  
                                         
                                         {/* Status badge */}
                                         <div className="hidden md:block">
@@ -960,12 +1377,12 @@ export default function Portfolio() {
                                         {/* Links with icons */}
                                         <div className="flex items-center gap-4">
                                             <a href="https://github.com/faiz-oussama/MoroccoGuide-AI" target="_blank" rel="noopener noreferrer" className="opacity-60 hover:opacity-100 transition-opacity duration-300">
-                                                <svg width="20" height="20" fill={darkMode ? "#F9F8F6" : "#000"} viewBox="0 0 24 24">
+                                                <svg width="20" height="20" fill={darkMode ? "#F9F8F6" : "#000"} style={{ transition: "fill 0.3s ease" }} viewBox="0 0 24 24">
                                                     <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
                                                 </svg>
                                             </a>
                                             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke={darkMode ? "#F9F8F6" : "#000"} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                                                <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke={darkMode ? "#F9F8F6" : "#000"} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ transition: "stroke 0.3s ease" }}/>
                                             </svg>
                                         </div>
                                     </div>
@@ -975,18 +1392,18 @@ export default function Portfolio() {
                         
                         {/* LogFlow Analytics Project */}
                         <div className="transform-gpu translate-y-0 scale-100 opacity-100">
-                            <a target="_blank" href="https://logflow-analytics.dev" className="card w-full h-[250px] border-b relative flex flex-col md:flex-row md:items-center group overflow-hidden" style={{
+                            <a target="_blank" href="https://logflow-analytics.dev" className="card w-full h-[250px] border-b relative flex flex-col md:flex-row md:items-center group overflow-hidden transition-all duration-500 ease-in-out" style={{
                                 borderColor: darkMode ? "#F9F8F6" : "#000",
-                                borderWidth: darkMode ? "2px" : "1px"
+                                borderWidth: darkMode ? "2px" : "1px",
+                                transition: "border-color 0.3s ease"
                             }}>
-                                
                                 {/* Animated background gradient */}
-                                <div className="absolute inset-0 bg-gradient-to-r from-[#6c72cb]/0 via-[#9c79e0]/0 to-[#cb69c1]/0 group-hover:from-[#6c72cb]/5 group-hover:via-[#9c79e0]/5 group-hover:to-[#cb69c1]/5 transition-all duration-500 ease-out opacity-0 group-hover:opacity-100"></div>
+                                <div className="absolute inset-0 bg-gradient-to-r from-[#6c72cb]/0 via-[#9c79e0]/0 to-[#cb69c1]/0 group-hover:from-[#6c72cb]/5 group-hover:via-[#9c79e0]/5 group-hover:to-[#cb69c1]/5 transition-all duration-500 ease-in-out opacity-0 group-hover:opacity-100"></div>
                                 
                                 {/* Animated line indicator */}
                                 <div className="absolute bottom-0 left-0 w-0 h-[3px] bg-gradient-to-r from-[#6c72cb] to-[#cb69c1] group-hover:w-full transition-all duration-700 ease-in-out"></div>
                                 
-                                <div className="card-text w-full h-full flex flex-col justify-between py-8 px-4 md:px-8 group-hover:translate-x-3 transition-all duration-500 ease-out">
+                                <div className="card-text w-full h-full flex flex-col justify-between py-8 px-4 md:px-8 group-hover:translate-x-2 transition-all duration-500 ease-in-out">
                                     <div className="flex justify-between items-start">
                                         <div className="flex flex-col">
                                             <p className="text-[0.7rem] uppercase tracking-[2px] mb-1 opacity-70 transition-opacity duration-300"
@@ -1027,12 +1444,12 @@ export default function Portfolio() {
                                         {/* Links with icons */}
                                         <div className="flex items-center gap-4">
                                             <a href="https://github.com/faiz-oussama/LogFlow-Analytics" target="_blank" rel="noopener noreferrer" className="opacity-60 hover:opacity-100 transition-opacity duration-300">
-                                                <svg width="20" height="20" fill={darkMode ? "#F9F8F6" : "#000"} viewBox="0 0 24 24">
+                                                <svg width="20" height="20" fill={darkMode ? "#F9F8F6" : "#000"} style={{ transition: "fill 0.3s ease" }} viewBox="0 0 24 24">
                                                     <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
                                                 </svg>
                                             </a>
                                             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke={darkMode ? "#F9F8F6" : "#000"} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                                                <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke={darkMode ? "#F9F8F6" : "#000"} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ transition: "stroke 0.3s ease" }}/>
                                             </svg>
                                         </div>
                                     </div>
@@ -1042,18 +1459,18 @@ export default function Portfolio() {
                         
                         {/* AI Visual Search Project */}
                         <div className="transform-gpu translate-y-0 scale-100 opacity-100">
-                            <a target="_blank" href="https://github.com/faiz-oussama/AI-Powered-Visual-and-Voice-Product-Search" className="card w-full h-[250px] border-b relative flex flex-col md:flex-row md:items-center group overflow-hidden" style={{
+                            <a target="_blank" href="https://ai-visual-search.vercel.app" className="card w-full h-[250px] border-b relative flex flex-col md:flex-row md:items-center group overflow-hidden transition-all duration-500 ease-in-out" style={{
                                 borderColor: darkMode ? "#F9F8F6" : "#000",
-                                borderWidth: darkMode ? "2px" : "1px"
+                                borderWidth: darkMode ? "2px" : "1px",
+                                transition: "border-color 0.3s ease"
                             }}>
-                                
                                 {/* Animated background gradient */}
-                                <div className="absolute inset-0 bg-gradient-to-r from-[#6c72cb]/0 via-[#9c79e0]/0 to-[#cb69c1]/0 group-hover:from-[#6c72cb]/5 group-hover:via-[#9c79e0]/5 group-hover:to-[#cb69c1]/5 transition-all duration-500 ease-out opacity-0 group-hover:opacity-100"></div>
+                                <div className="absolute inset-0 bg-gradient-to-r from-[#6c72cb]/0 via-[#9c79e0]/0 to-[#cb69c1]/0 group-hover:from-[#6c72cb]/5 group-hover:via-[#9c79e0]/5 group-hover:to-[#cb69c1]/5 transition-all duration-500 ease-in-out opacity-0 group-hover:opacity-100"></div>
                                 
                                 {/* Animated line indicator */}
                                 <div className="absolute bottom-0 left-0 w-0 h-[3px] bg-gradient-to-r from-[#6c72cb] to-[#cb69c1] group-hover:w-full transition-all duration-700 ease-in-out"></div>
                                 
-                                <div className="card-text w-full h-full flex flex-col justify-between py-8 px-4 md:px-8 group-hover:translate-x-3 transition-all duration-500 ease-out">
+                                <div className="card-text w-full h-full flex flex-col justify-between py-8 px-4 md:px-8 group-hover:translate-x-2 transition-all duration-500 ease-in-out">
                                     <div className="flex justify-between items-start">
                                         <div className="flex flex-col">
                                             <p className="text-[0.7rem] uppercase tracking-[2px] mb-1 opacity-70 transition-opacity duration-300"
@@ -1091,12 +1508,12 @@ export default function Portfolio() {
                                         {/* Links with icons */}
                                         <div className="flex items-center gap-4">
                                             <a href="https://github.com/faiz-oussama/AI-Powered-Visual-and-Voice-Product-Search" target="_blank" rel="noopener noreferrer" className="opacity-60 hover:opacity-100 transition-opacity duration-300">
-                                                <svg width="20" height="20" fill={darkMode ? "#F9F8F6" : "#000"} viewBox="0 0 24 24">
+                                                <svg width="20" height="20" fill={darkMode ? "#F9F8F6" : "#000"} style={{ transition: "fill 0.3s ease" }} viewBox="0 0 24 24">
                                                     <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
                                                 </svg>
                                             </a>
                                             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke={darkMode ? "#F9F8F6" : "#000"} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                                                <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke={darkMode ? "#F9F8F6" : "#000"} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ transition: "stroke 0.3s ease" }}/>
                                             </svg>
                                         </div>
                                     </div>
@@ -1106,17 +1523,18 @@ export default function Portfolio() {
                         
                         {/* GoMaps Explorer Project */}
                         <div className="transform-gpu translate-y-0 scale-100 opacity-100">
-                            <a target="_blank" href="https://github.com/faiz-oussama/GoMaps" className="card w-full h-[250px] border-b relative flex flex-col md:flex-row md:items-center group overflow-hidden" style={{
+                            <a target="_blank" href="https://github.com/faiz-oussama/GoMaps" className="card w-full h-[250px] border-b relative flex flex-col md:flex-row md:items-center group overflow-hidden transition-all duration-500 ease-in-out" style={{
                                 borderColor: darkMode ? "#F9F8F6" : "#000",
-                                borderWidth: darkMode ? "2px" : "1px"
+                                borderWidth: darkMode ? "2px" : "1px",
+                                transition: "border-color 0.3s ease"
                             }}>
                                 {/* Animated background gradient */}
-                                <div className="absolute inset-0 bg-gradient-to-r from-[#6c72cb]/0 via-[#9c79e0]/0 to-[#cb69c1]/0 group-hover:from-[#6c72cb]/5 group-hover:via-[#9c79e0]/5 group-hover:to-[#cb69c1]/5 transition-all duration-500 ease-out opacity-0 group-hover:opacity-100"></div>
+                                <div className="absolute inset-0 bg-gradient-to-r from-[#6c72cb]/0 via-[#9c79e0]/0 to-[#cb69c1]/0 group-hover:from-[#6c72cb]/5 group-hover:via-[#9c79e0]/5 group-hover:to-[#cb69c1]/5 transition-all duration-500 ease-in-out opacity-0 group-hover:opacity-100"></div>
                                 
                                 {/* Animated line indicator */}
                                 <div className="absolute bottom-0 left-0 w-0 h-[3px] bg-gradient-to-r from-[#6c72cb] to-[#cb69c1] group-hover:w-full transition-all duration-700 ease-in-out"></div>
                                 
-                                <div className="card-text w-full h-full flex flex-col justify-between py-8 px-4 md:px-8 group-hover:translate-x-3 transition-all duration-500 ease-out">
+                                <div className="card-text w-full h-full flex flex-col justify-between py-8 px-4 md:px-8 group-hover:translate-x-2 transition-all duration-500 ease-in-out">
                                     <div className="flex justify-between items-start">
                                         <div className="flex flex-col">
                                             <p className="text-[0.7rem] uppercase tracking-[2px] mb-1 opacity-70 transition-opacity duration-300"
@@ -1154,12 +1572,12 @@ export default function Portfolio() {
                                         {/* Links with icons */}
                                         <div className="flex items-center gap-4">
                                             <a href="https://github.com/faiz-oussama/GoMaps" target="_blank" rel="noopener noreferrer" className="opacity-60 hover:opacity-100 transition-opacity duration-300">
-                                                <svg width="20" height="20" fill={darkMode ? "#F9F8F6" : "#000"} viewBox="0 0 24 24">
+                                                <svg width="20" height="20" fill={darkMode ? "#F9F8F6" : "#000"} style={{ transition: "fill 0.3s ease" }} viewBox="0 0 24 24">
                                                     <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
                                                 </svg>
                                             </a>
                                             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke={darkMode ? "#F9F8F6" : "#000"} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                                                <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke={darkMode ? "#F9F8F6" : "#000"} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ transition: "stroke 0.3s ease" }}/>
                                             </svg>
                                         </div>
                                     </div>
@@ -1169,18 +1587,18 @@ export default function Portfolio() {
                         
                         {/* EduPortal Project */}
                         <div className="transform-gpu translate-y-0 scale-100 opacity-100">
-                            <a target="_blank" href="https://github.com/faiz-oussama/University-Management-System" className="card w-full h-[250px] border-b relative flex flex-col md:flex-row md:items-center group overflow-hidden" style={{
+                            <a target="_blank" href="https://github.com/faiz-oussama/University-Management-System" className="card w-full h-[250px] border-b relative flex flex-col md:flex-row md:items-center group overflow-hidden transition-all duration-500 ease-in-out" style={{
                                 borderColor: darkMode ? "#F9F8F6" : "#000",
-                                borderWidth: darkMode ? "2px" : "1px"
+                                borderWidth: darkMode ? "2px" : "1px",
+                                transition: "border-color 0.3s ease"
                             }}>
-                                
                                 {/* Animated background gradient */}
-                                <div className="absolute inset-0 bg-gradient-to-r from-[#6c72cb]/0 via-[#9c79e0]/0 to-[#cb69c1]/0 group-hover:from-[#6c72cb]/5 group-hover:via-[#9c79e0]/5 group-hover:to-[#cb69c1]/5 transition-all duration-500 ease-out opacity-0 group-hover:opacity-100"></div>
+                                <div className="absolute inset-0 bg-gradient-to-r from-[#6c72cb]/0 via-[#9c79e0]/0 to-[#cb69c1]/0 group-hover:from-[#6c72cb]/5 group-hover:via-[#9c79e0]/5 group-hover:to-[#cb69c1]/5 transition-all duration-500 ease-in-out opacity-0 group-hover:opacity-100"></div>
                                 
                                 {/* Animated line indicator */}
                                 <div className="absolute bottom-0 left-0 w-0 h-[3px] bg-gradient-to-r from-[#6c72cb] to-[#cb69c1] group-hover:w-full transition-all duration-700 ease-in-out"></div>
                                 
-                                <div className="card-text w-full h-full flex flex-col justify-between py-8 px-4 md:px-8 group-hover:translate-x-3 transition-all duration-500 ease-out">
+                                <div className="card-text w-full h-full flex flex-col justify-between py-8 px-4 md:px-8 group-hover:translate-x-2 transition-all duration-500 ease-in-out">
                                     <div className="flex justify-between items-start">
                                         <div className="flex flex-col">
                                             <p className="text-[0.7rem] uppercase tracking-[2px] mb-1 opacity-70 transition-opacity duration-300"
@@ -1221,12 +1639,12 @@ export default function Portfolio() {
                                         {/* Links with icons */}
                                         <div className="flex items-center gap-4">
                                             <a target="_blank" href="https://github.com/faiz-oussama/University-Management-System" rel="noopener noreferrer" className="opacity-60 hover:opacity-100 transition-opacity duration-300">
-                                                <svg width="20" height="20" fill={darkMode ? "#F9F8F6" : "#000"} viewBox="0 0 24 24">
+                                                <svg width="20" height="20" fill={darkMode ? "#F9F8F6" : "#000"} style={{ transition: "fill 0.3s ease" }} viewBox="0 0 24 24">
                                                     <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
                                                 </svg>
                                             </a>
                                             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke={darkMode ? "#F9F8F6" : "#000"} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                                                <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke={darkMode ? "#F9F8F6" : "#000"} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ transition: "stroke 0.3s ease" }}/>
                                             </svg>
                                         </div>
                                     </div>
@@ -1234,20 +1652,20 @@ export default function Portfolio() {
                             </a>
                         </div>
                         
-                        {/* Real-time Chat App */}
+                        {/* SecureChat Project - KEEP ONLY THIS ONE */}
                         <div className="transform-gpu translate-y-0 scale-100 opacity-100">
-                            <a target="_blank" href="https://github.com/faiz-oussama/Chat-App-Advanced" className="card w-full h-[250px] border-b relative flex flex-col md:flex-row md:items-center group overflow-hidden" style={{
+                            <a target="_blank" href="https://github.com/faiz-oussama/Security-Chat-App" className="card w-full h-[250px] border-b relative flex flex-col md:flex-row md:items-center group overflow-hidden transition-all duration-500 ease-in-out" style={{
                                 borderColor: darkMode ? "#F9F8F6" : "#000",
-                                borderWidth: darkMode ? "2px" : "1px"
+                                borderWidth: darkMode ? "2px" : "1px",
+                                transition: "border-color 0.3s ease"
                             }}>
-                                
                                 {/* Animated background gradient */}
-                                <div className="absolute inset-0 bg-gradient-to-r from-[#6c72cb]/0 via-[#9c79e0]/0 to-[#cb69c1]/0 group-hover:from-[#6c72cb]/5 group-hover:via-[#9c79e0]/5 group-hover:to-[#cb69c1]/5 transition-all duration-500 ease-out opacity-0 group-hover:opacity-100"></div>
+                                <div className="absolute inset-0 bg-gradient-to-r from-[#6c72cb]/0 via-[#9c79e0]/0 to-[#cb69c1]/0 group-hover:from-[#6c72cb]/5 group-hover:via-[#9c79e0]/5 group-hover:to-[#cb69c1]/5 transition-all duration-500 ease-in-out opacity-0 group-hover:opacity-100"></div>
                                 
                                 {/* Animated line indicator */}
                                 <div className="absolute bottom-0 left-0 w-0 h-[3px] bg-gradient-to-r from-[#6c72cb] to-[#cb69c1] group-hover:w-full transition-all duration-700 ease-in-out"></div>
                                 
-                                <div className="card-text w-full h-full flex flex-col justify-between py-8 px-4 md:px-8 group-hover:translate-x-3 transition-all duration-500 ease-out">
+                                <div className="card-text w-full h-full flex flex-col justify-between py-8 px-4 md:px-8 group-hover:translate-x-2 transition-all duration-500 ease-in-out">
                                     <div className="flex justify-between items-start">
                                         <div className="flex flex-col">
                                             <p className="text-[0.7rem] uppercase tracking-[2px] mb-1 opacity-70 transition-opacity duration-300"
@@ -1284,13 +1702,13 @@ export default function Portfolio() {
                                         
                                         {/* Links with icons */}
                                         <div className="flex items-center gap-4">
-                                            <a target="_blank" href="https://github.com/faiz-oussama/Chat-App-Advanced" rel="noopener noreferrer" className="opacity-60 hover:opacity-100 transition-opacity duration-300">
-                                                <svg width="20" height="20" fill={darkMode ? "#F9F8F6" : "#000"} viewBox="0 0 24 24">
+                                            <a target="_blank" href="https://github.com/faiz-oussama/Security-Chat-App" rel="noopener noreferrer" className="opacity-60 hover:opacity-100 transition-opacity duration-300">
+                                                <svg width="20" height="20" fill={darkMode ? "#F9F8F6" : "#000"} style={{ transition: "fill 0.3s ease" }} viewBox="0 0 24 24">
                                                     <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
                                                 </svg>
                                             </a>
                                             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke={darkMode ? "#F9F8F6" : "#000"} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                                                <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke={darkMode ? "#F9F8F6" : "#000"} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ transition: "stroke 0.3s ease" }}/>
                                             </svg>
                                         </div>
                                     </div>
@@ -1315,7 +1733,7 @@ export default function Portfolio() {
                 </div>
             </section>
             {/* ABOUT SECTION */}
-            <section className="about w-full m-[8em_auto] max-w-[1160px] px-[40px]" id="about">
+            <section id="about" className="about w-full m-[8em_auto] max-w-[1160px] px-[40px]" ref={aboutRef}>
                 <div className="section-header relative mb-16 flex flex-col items-center">
                     <p className="section-title text-[1.2rem] font-light tracking-[1px] uppercase relative z-10 before:absolute before:w-12 before:h-[3px] before:bg-gradient-to-r before:from-[#6c72cb] before:to-[#cb69c1] before:-bottom-4 before:left-1/2 before:-translate-x-1/2" style={{
                         color: darkMode ? "#F9F8F6" : "#000"
@@ -1469,7 +1887,7 @@ export default function Portfolio() {
             </section>
 
             {/* Skills */}
-            <section className="w-full my-[10em] px-10 flex items-center justify-center flex-col gap-20 overflow-x-hidden" id="skills">
+            <section id="skills" className="w-full my-[10em] px-10 flex items-center justify-center flex-col gap-20 overflow-x-hidden" ref={skillsRef}>
             <p className="text-[1.2rem] font-light tracking-[0.5px] uppercase opacity-50" 
                 style={{ color: darkMode ? "#F9F8F6" : "#000" }}>
                 Skills & Services
@@ -1477,31 +1895,34 @@ export default function Portfolio() {
 
             <div className="flex flex-col gap-20 w-full">
                 {/* Web development */}
-                <div className="flex items-center justify-center">
+                <div className="skill-item flex items-center justify-center">
+                    <div className="skill-content flex items-center justify-center">
                 <p className="text-[clamp(1.5rem,7vw,7rem)] whitespace-nowrap font-semibold tracking-[-0.05em]"
                     style={{ color: darkMode ? "#F9F8F6" : "#000" }}>
                     Web
                 </p>
-                <div className="video-wrapper w-0 md:w-12 lg:w-[12rem] mx-4 border-2 border-transparent rounded-[30px] overflow-hidden flex items-center justify-center transition-all duration-500 video-visible">
-                    <video preload="auto" autoPlay loop playsInline poster="https://davidhaz.com/images/web_development_placeholder.webp" className="w-full h-full object-cover rounded-[30px] transform scale-100 transition-transform duration-500">
-                    <source src="https://davidhaz.com/videos/web_develop.mp4" type="video/mp4" />
+                        <div className="video-wrapper w-0 md:w-0 lg:w-0 mx-0 border-2 border-transparent rounded-[30px] overflow-hidden flex items-center justify-center transition-all duration-500">
+                            <video preload="auto" autoPlay loop playsInline className="w-full h-full object-cover rounded-[30px] transform scale-100 transition-transform duration-500">
+                            <source src="/videos/web_development.mp4" type="video/mp4" />
                     </video>
                 </div>
                 <p className="text-[clamp(1.5rem,7vw,7rem)] whitespace-nowrap font-semibold tracking-[-0.05em]"
                     style={{ color: darkMode ? "#F9F8F6" : "#000" }}>
                     development
                 </p>
+                    </div>
                 </div>
 
                 {/* Interface design */}
-                <div className="flex items-center justify-center">
+                <div className="skill-item flex items-center justify-center">
+                    <div className="skill-content flex items-center justify-center">
                 <p className="text-[clamp(1.5rem,7vw,7rem)] whitespace-nowrap font-semibold tracking-[-0.05em]"
                     style={{ color: darkMode ? "#F9F8F6" : "#000" }}>
                     Interface
                 </p>
-                <div className="video-wrapper w-0 md:w-8 lg:w-[12rem] mx-4 border-2 border-transparent rounded-[30px] overflow-hidden flex items-center justify-center transition-all duration-500 video-visible">
+                        <div className="video-wrapper w-0 md:w-0 lg:w-0 mx-0 border-2 border-transparent rounded-[30px] overflow-hidden flex items-center justify-center transition-all duration-500">
                     <video preload="auto" autoPlay loop playsInline poster="https://davidhaz.com/images/interface_design_placeholder.webp" className="w-full h-full object-cover rounded-[30px] transform scale-100 transition-transform duration-500">
-                    <source src="https://davidhaz.com/videos/interface_design.mp4" type="video/mp4" />
+                                <source src="/videos/interface_design.mp4" type="video/mp4" />
                     </video>
                 </div>
                 <p className="text-[clamp(1.5rem,7vw,7rem)] whitespace-nowrap font-semibold tracking-[-0.05em]"
@@ -1509,78 +1930,79 @@ export default function Portfolio() {
                     design
                 </p>
                 </div>
-
-                {/* 3D web experiences */}
-                <div className="flex items-center justify-center">
-                <p className="text-[clamp(1.5rem,7vw,7rem)] whitespace-nowrap font-semibold tracking-[-0.05em]"
-                    style={{ color: darkMode ? "#F9F8F6" : "#000" }}>
-                    3D web
-                </p>
-                <div className="video-wrapper w-0 md:w-8 lg:w-[12rem] mx-4 border-2 border-transparent rounded-[30px] overflow-hidden flex items-center justify-center transition-all duration-500 video-visible">
-                    <video preload="auto" autoPlay loop playsInline poster="https://davidhaz.com/images/3d_web_experiences_placeholder.webp" className="w-full h-full object-cover rounded-[30px] transform scale-100 transition-transform duration-500">
-                    <source src="https://davidhaz.com/videos/3d_web_experiences.mp4" type="video/mp4" />
-                    </video>
-                </div>
-                <p className="text-[clamp(1.5rem,7vw,7rem)] whitespace-nowrap font-semibold tracking-[-0.05em]"
-                    style={{ color: darkMode ? "#F9F8F6" : "#000" }}>
-                    experiences
-                </p>
                 </div>
 
                 {/* Creative coding */}
-                <div className="flex items-center justify-center">
+                <div className="skill-item flex items-center justify-center">
+                    <div className="skill-content flex items-center justify-center">
                 <p className="text-[clamp(1.5rem,7vw,7rem)] whitespace-nowrap font-semibold tracking-[-0.05em]"
                     style={{ color: darkMode ? "#F9F8F6" : "#000" }}>
                     Creative
                 </p>
-                <div className="video-wrapper w-0 md:w-8 lg:w-[12rem] mx-4 border-2 border-transparent rounded-[30px] overflow-hidden flex items-center justify-center transition-all duration-500 video-visible">
+                        <div className="video-wrapper w-0 md:w-0 lg:w-0 mx-0 border-2 border-transparent rounded-[30px] overflow-hidden flex items-center justify-center transition-all duration-500">
                     <video preload="none" autoPlay loop playsInline poster="https://davidhaz.com/images/creative_coding_placeholder.webp" className="w-full h-full object-cover rounded-[30px] transform scale-100 transition-transform duration-500">
-                    <source src="https://davidhaz.com/videos/creative_coding.mp4" type="video/mp4" />
+                                <source src="/videos/creative_coding.mp4" type="video/mp4" />
                     </video>
                 </div>
                 <p className="text-[clamp(1.5rem,7vw,7rem)] whitespace-nowrap font-semibold tracking-[-0.05em]"
                     style={{ color: darkMode ? "#F9F8F6" : "#000" }}>
                     coding
                 </p>
+                    </div>
                 </div>
 
                 {/* Solid engineering */}
-                <div className="flex items-center justify-center">
+                <div className="skill-item flex items-center justify-center">
+                    <div className="skill-content flex items-center justify-center">
                 <p className="text-[clamp(1.5rem,7vw,7rem)] whitespace-nowrap font-semibold tracking-[-0.05em]"
                     style={{ color: darkMode ? "#F9F8F6" : "#000" }}>
                     Solid
                 </p>
-                <div className="video-wrapper w-0 md:w-8 lg:w-[12rem] mx-4 border-2 border-transparent rounded-[30px] overflow-hidden flex items-center justify-center transition-all duration-500 video-visible">
+                        <div className="video-wrapper w-0 md:w-0 lg:w-0 mx-0 border-2 border-transparent rounded-[30px] overflow-hidden flex items-center justify-center transition-all duration-500">
                     <video preload="auto" autoPlay loop playsInline poster="https://davidhaz.com/images/solid_engineering_placeholder.webp" className="w-full h-full object-cover rounded-[30px] transform scale-100 transition-transform duration-500">
-                    <source src="https://davidhaz.com/videos/solid_engineering.mp4" type="video/mp4" />
+                            <source src="/videos/solid_engineering.mp4" type="video/mp4" />
                     </video>
                 </div>
                 <p className="text-[clamp(1.5rem,7vw,7rem)] whitespace-nowrap font-semibold tracking-[-0.05em]"
                     style={{ color: darkMode ? "#F9F8F6" : "#000" }}>
                     engineering
                 </p>
+                    </div>
                 </div>
             </div>
             </section>
 
             {/* CONTACT SECTION */}
-            <section className="contact-container w-full max-w-[1800px] m-[2em_auto_auto] h-auto px-[40px]" id="contact">
-                <div className="contact relative w-full overflow-x-hidden h-[700px] rounded-[30px] py-[5em] px-[6em] mb-[2em]">
-                    <img src="/bg.webp" alt="Contact background" className="absolute inset-0 w-full h-full object-cover rounded-[30px]"/>
+            <section id="contact" className="contact-container w-full max-w-[1800px] m-[2em_auto_auto] h-auto px-[20px] md:px-[40px]" ref={contactRef}>
+                <div className="contact relative w-full overflow-hidden h-auto min-h-[500px] md:h-[700px] rounded-[20px] md:rounded-[30px] py-[3em] md:py-[5em] px-[2em] md:px-[6em] mb-[2em]">
+                    <img src="/bg.webp" alt="Contact background" className="absolute inset-0 w-full h-full object-cover rounded-[20px] md:rounded-[30px]"/>
                     
                     <div className="contact-content h-full relative flex flex-col justify-between z-[2]">
-                        <h2 className="text-[6rem] font-medium text-[#F9F8F6] leading-[1.05em]">
+                        <h2 className="text-[2.5rem] sm:text-[3.5rem] md:text-[4.5rem] lg:text-[6rem] font-medium text-[#F9F8F6] leading-[1.05em]">
                             Wanna create <br/> something <span className="font-bold">awesome</span> <br/> together?
                         </h2>
                         
-                        <div className="contact-details self-end flex flex-col items-end">
-                            <a href="mailto:faizouss123@gmail.com" className="star-button text-[#F9F8F6] border-2 border-[#F9F8F6] hover:bg-[#F9F8F6] hover:text-black p-[0.5em_1em] rounded-[50px] flex gap-[0.3em] items-center font-medium text-[1.8rem]">
+                        <div className="contact-details self-end flex flex-col items-end mt-8 md:mt-0">
+                            <a href="mailto:faizouss123@gmail.com" className="star-button text-[#F9F8F6] border-2 border-[#F9F8F6] hover:bg-[#F9F8F6] hover:text-black p-[0.5em_1em] rounded-[50px] flex gap-[0.3em] items-center font-medium text-[1.2rem] sm:text-[1.5rem] md:text-[1.8rem]">
                                 <span>✦</span>Let's talk<span>✦</span>
                             </a>
                             
-                            <p className="mail-link font-light text-[1.4rem] text-[#F9F8F6] mt-[1em]">
+                            <div className="social-links flex gap-4 mt-4">
+                                <a href="https://github.com/faiz-oussama" target="_blank" rel="noopener noreferrer" className="social-circle w-[40px] h-[40px] sm:w-[45px] sm:h-[45px] md:w-[50px] md:h-[50px] bg-transparent border-2 border-[#F9F8F6] rounded-full flex items-center justify-center text-[#F9F8F6] hover:bg-[#F9F8F6] hover:text-black transition-all duration-300">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M12 2C6.477 2 2 6.477 2 12C2 16.418 4.865 20.167 8.839 21.65C9.339 21.75 9.5 21.442 9.5 21.167C9.5 20.917 9.5 20.167 9.5 19.333C6.735 19.95 6.14 18 6.14 18C5.684 16.903 5.03 16.6 5.03 16.6C4.122 15.967 5.095 16 5.095 16C6.1 16.067 6.64 17.017 6.64 17.017C7.55 18.517 9.133 18.067 9.54 17.8C9.638 17.15 9.89 16.7 10.17 16.45C7.973 16.2 5.65 15.367 5.65 11.5C5.65 10.4 6.04 9.517 6.65 8.8C6.54 8.55 6.203 7.5 6.75 6.15C6.75 6.15 7.612 5.883 9.5 7.173C10.29 6.95 11.15 6.842 12 6.842C12.85 6.842 13.71 6.95 14.5 7.173C16.388 5.883 17.25 6.15 17.25 6.15C17.797 7.503 17.46 8.553 17.35 8.8C17.963 9.517 18.35 10.403 18.35 11.5C18.35 15.383 16.027 16.2 13.813 16.433C14.17 16.733 14.5 17.333 14.5 18.233C14.5 19.567 14.5 20.817 14.5 21.167C14.5 21.442 14.66 21.75 15.167 21.65C19.135 20.16 22 16.417 22 12C22 6.477 17.523 2 12 2Z" fill="currentColor"/>
+                                    </svg>
+                                </a>
+                                <a href="https://linkedin.com/in/oussama-faiz" target="_blank" rel="noopener noreferrer" className="social-circle w-[40px] h-[40px] sm:w-[45px] sm:h-[45px] md:w-[50px] md:h-[50px] bg-transparent border-2 border-[#F9F8F6] rounded-full flex items-center justify-center text-[#F9F8F6] hover:bg-[#F9F8F6] hover:text-black transition-all duration-300">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M19 3C19.5304 3 20.0391 3.21071 20.4142 3.58579C20.7893 3.96086 21 4.46957 21 5V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H19ZM18.5 18.5V13.2C18.5 12.3354 18.1565 11.5062 17.5452 10.8948C16.9338 10.2835 16.1046 9.94 15.24 9.94C14.39 9.94 13.4 10.46 12.92 11.24V10.13H10.13V18.5H12.92V13.57C12.92 12.8 13.54 12.17 14.31 12.17C14.6813 12.17 15.0374 12.3175 15.2999 12.5801C15.5625 12.8426 15.71 13.1987 15.71 13.57V18.5H18.5ZM6.88 8.56C7.32556 8.56 7.75288 8.383 8.06794 8.06794C8.383 7.75288 8.56 7.32556 8.56 6.88C8.56 5.95 7.81 5.19 6.88 5.19C6.43178 5.19 6.00193 5.36805 5.68499 5.68499C5.36805 6.00193 5.19 6.43178 5.19 6.88C5.19 7.81 5.95 8.56 6.88 8.56ZM8.27 18.5V10.13H5.5V18.5H8.27Z" fill="currentColor"/>
+                                    </svg>
+                                </a>
+                            </div>
+                            
+                            <p className="mail-link font-light text-[1rem] sm:text-[1.2rem] md:text-[1.4rem] text-[#F9F8F6] mt-[1em]">
                                 Don't like flashy buttons? Reach out at&nbsp;
-                                <a className="text-[#F9F8F6] font-medium border-b-2 border-transparent transition-[border-bottom] duration-300 hover:cursor-pointer hover:border-white">contact@example.com</a>
+                                <a href="mailto:faizouss123@gmail.com" className="text-[#F9F8F6] font-medium border-b-2 border-transparent transition-[border-bottom] duration-300 hover:cursor-pointer hover:border-white">faizouss123@gmail.com</a>
                             </p>
                         </div>
                     </div>

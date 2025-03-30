@@ -166,6 +166,7 @@ const RotatingText = forwardRef((props, ref) => {
       {...rest}
       layout
       transition={transition}
+      style={{ color: "#000000", ...rest.style }}
     >
       {/* Screen-reader only text */}
       <span className="sr-only">{texts[currentTextIndex]}</span>
