@@ -15,13 +15,11 @@ import ToggleButton from './ToggleButton';
 export default function Portfolio() {
     const { darkMode } = useContext(DarkModeContext);
     const grainCanvasRef = useRef(null);
-    const contactGrainCanvasRef = useRef(null);
     const [menuOpen, setMenuOpen] = useState(false);
     const [currentStatIndex, setCurrentStatIndex] = useState(0);
     const [currentProjectIndex, setCurrentProjectIndex] = useState(0);
     const [activeSection, setActiveSection] = useState('');
     
-    // Stats and blog data
     const stats = [
         {
             number: "132+",
@@ -80,30 +78,75 @@ export default function Portfolio() {
         }
     ];
 
- 
-    // Add a ref to store the section that was active before opening the menu
     const menuPreviousSectionRef = useRef(null);
     
-    // Refine the toggleMenu function to prevent scroll animation on menu close
     const toggleMenu = () => {
-        // Store current section before toggling menu
-        const currentSection = activeSection;
-        
-        // Toggle menu state
-        setMenuOpen(prevState => {
-            // When opening the menu
-            if (!prevState) {
-                // Store current scroll position and section in a ref
-                window.menuScrollY = window.scrollY;
-                menuPreviousSectionRef.current = currentSection;
-                return true;
-            } 
-            // When closing the menu
-            else {
-                return false;
-            }
-        });
+        setMenuOpen(prevState => !prevState);
     };
+    
+    const closeMenu = () => {
+        setMenuOpen(false);
+    };
+    
+    useEffect(() => {
+        if (menuOpen) {
+            window.menuScrollY = window.scrollY;
+            menuPreviousSectionRef.current = activeSection;
+            
+            document.body.classList.add('menu-open');
+            document.body.style.top = `-${window.menuScrollY}px`;
+            document.body.style.position = 'fixed';
+            document.body.style.width = '100%';
+            document.body.style.height = '100vh';
+            document.body.style.overflow = 'hidden';
+            
+            const menuOverlay = document.querySelector('.mobile-menu-overlay');
+            if (menuOverlay) {
+                menuOverlay.classList.add('open');
+                menuOverlay.style.opacity = '1';
+                menuOverlay.style.visibility = 'visible';
+            }
+        } else {
+            const sectionToRestore = menuPreviousSectionRef.current;
+            
+            document.body.classList.remove('menu-open');
+            document.body.style.top = '';
+            document.body.style.position = '';
+            document.body.style.width = '';
+            document.body.style.height = '';
+            document.body.style.overflow = '';
+            
+            const menuOverlay = document.querySelector('.mobile-menu-overlay');
+            if (menuOverlay) {
+                menuOverlay.classList.remove('open');
+                menuOverlay.style.opacity = '0';
+                menuOverlay.style.visibility = 'hidden';
+            }
+            
+            if (window.menuScrollY !== undefined && sectionToRestore) {
+                userClickedNavigationRef.current = true;
+                
+                window.lastClickedSection = sectionToRestore;
+                
+                window.scrollTo({
+                    top: window.menuScrollY,
+                    behavior: 'auto'
+                });
+                
+                setActiveSection(sectionToRestore);
+                
+                if (clickTimeoutIdRef.current) {
+                    clearTimeout(clickTimeoutIdRef.current);
+                }
+                
+                clickTimeoutIdRef.current = setTimeout(() => {
+                    userClickedNavigationRef.current = false;
+                }, 2000);
+                
+                window.menuScrollY = undefined;
+            }
+        }
+    }, [menuOpen, activeSection]);
     
     useEffect(() => {
         const timer = setInterval(() => {
@@ -113,61 +156,28 @@ export default function Portfolio() {
         return () => clearInterval(timer);
     }, []);
 
-    // Update the default active section to be the top of the page instead of projects
     useEffect(() => {
-        // Force an initial active section on component mount
-        setActiveSection('hero'); // Set to hero section instead of projects as default
+        setActiveSection('hero');
     }, []);
 
-    // Add a ref to track user navigation clicks
     const userClickedNavigationRef = useRef(false);
     const clickTimeoutIdRef = useRef(null);
 
-    // Fix the handleNavClick function to ensure it keeps the selected section highlighted
     const handleNavClick = (section, event) => {
-        // Prevent default anchor behavior
         if (event) event.preventDefault();
         
-        // Set flag to prevent scroll handler from changing activeSection
         userClickedNavigationRef.current = true;
         
-        // Clear any existing timeout
         if (clickTimeoutIdRef.current) clearTimeout(clickTimeoutIdRef.current);
         
-        // Set active section immediately
         setActiveSection(section);
         
-        // Remember which section was selected by user click
         window.lastClickedSection = section;
         
-        // Close mobile menu immediately if open - ensure complete cleanup
         if (menuOpen) {
-            setMenuOpen(false); // Update state first
-            
-            // Make sure body classes and styles are reset
-            document.body.classList.remove('menu-open');
-            document.body.style.top = '';
-            document.body.style.position = '';
-            document.body.style.width = '';
-            document.body.style.height = '';
-            document.body.style.overflow = '';
-            
-            // Force menu overlay to be hidden immediately
-            const menuOverlay = document.querySelector('.mobile-menu-overlay');
-            if (menuOverlay) {
-                menuOverlay.classList.remove('open');
-                menuOverlay.style.opacity = '0';
-                menuOverlay.style.visibility = 'hidden';
-            }
-            
-            // Restore scroll position
-            if (window.menuScrollY !== undefined) {
-                window.scrollTo(0, window.menuScrollY);
-                window.menuScrollY = undefined;
-            }
+            setMenuOpen(false);
         }
         
-        // Navigate to section - do this after menu is closed
         setTimeout(() => {
             const targetElement = document.getElementById(section);
             if (targetElement) {
@@ -180,35 +190,27 @@ export default function Portfolio() {
                     behavior: 'smooth'
                 });
                 
-                // Keep the userClickedNavigation flag true for longer to prevent scroll handler from changing activeSection
                 clickTimeoutIdRef.current = setTimeout(() => {
                     userClickedNavigationRef.current = false;
-                }, 2500); // Substantially increase timeout to ensure scroll completes
+                }, 2500);
             }
-        }, 10); // Very short timeout to ensure DOM updates first
+        }, menuOpen ? 300 : 10);
     };
 
-    // Update the scroll detection logic to respect the last clicked section
     useEffect(() => {
-        // Find all section elements
         const heroSection = document.getElementById('hero');
         const projectsSection = document.getElementById('projects');
         const aboutSection = document.getElementById('about');
         const skillsSection = document.getElementById('skills');
         const contactSection = document.getElementById('contact');
         
-        // Function to determine active section based on scroll position
         const handleScroll = () => {
-            // Skip updating activeSection if we're currently in a programmatic navigation
             if (userClickedNavigationRef.current) return;
             
-            // Use a smaller offset for better detection
             const scrollPosition = window.scrollY + 100;
             
-            // Using direct references instead of querySelectorAll for better reliability
             let newSection = null;
             
-            // Check each section in reverse order (bottom to top)
             if (contactSection && scrollPosition >= contactSection.offsetTop - 200) {
                 newSection = 'contact';
             } else if (skillsSection && scrollPosition >= skillsSection.offsetTop - 200) {
@@ -218,37 +220,29 @@ export default function Portfolio() {
             } else if (projectsSection && scrollPosition >= projectsSection.offsetTop - 200) {
                 newSection = 'projects';
             } else if (scrollPosition < 300) {
-                // Default to hero if at the top, but be more specific about the scroll position
                 newSection = 'hero';
             }
             
-            // Update active section if it changed and we're not in the middle of a click navigation
             if (newSection && newSection !== activeSection && !userClickedNavigationRef.current) {
-                // Special case: if we have a lastClickedSection and we're close to it in terms of scroll position,
-                // prefer to keep that section highlighted
                 if (window.lastClickedSection) {
                     const clickedSectionElement = document.getElementById(window.lastClickedSection);
                     if (clickedSectionElement) {
                         const clickedSectionTop = clickedSectionElement.offsetTop;
                         const clickedSectionBottom = clickedSectionTop + clickedSectionElement.offsetHeight;
                         
-                        // If we're within the section or close to it (within 200px), keep it active
                         if (Math.abs(scrollPosition - clickedSectionTop) < 200 || 
                             (scrollPosition >= clickedSectionTop - 200 && scrollPosition <= clickedSectionBottom + 200)) {
                             newSection = window.lastClickedSection;
                         } else {
-                            // We've scrolled far enough from last clicked section, clear it
                             window.lastClickedSection = null;
                         }
                     }
                 }
                 
-                console.log('Setting active section to:', newSection, 'at scroll position:', scrollPosition);
                 setActiveSection(newSection);
             }
         };
         
-        // Add scroll event listener with throttling
         let ticking = false;
         const scrollListener = () => {
             if (!ticking) {
@@ -262,7 +256,6 @@ export default function Portfolio() {
         
         window.addEventListener('scroll', scrollListener);
         
-        // Initial check when component mounts but only if we're not in a user navigation
         if (!userClickedNavigationRef.current) {
             setTimeout(handleScroll, 500);
         }
@@ -273,9 +266,7 @@ export default function Portfolio() {
         };
     }, [activeSection]);
 
-    // Add this useEffect to handle smooth scrolling
     useEffect(() => {
-        // Select all links with hash (#) in the href
         const links = document.querySelectorAll('a[href^="#"]');
         
         const handleClick = (e) => {
@@ -287,7 +278,7 @@ export default function Portfolio() {
             const targetElement = document.getElementById(href.substring(1));
             
             if (targetElement) {
-                const headerOffset = 80; // Adjust based on your header height
+                const headerOffset = 80;
                 const elementPosition = targetElement.getBoundingClientRect().top;
                 const offsetPosition = elementPosition + window.scrollY - headerOffset;
                 
@@ -296,19 +287,16 @@ export default function Portfolio() {
                     behavior: 'smooth'
                 });
                 
-                // Close mobile menu if open
                 if (menuOpen) {
                     setMenuOpen(false);
                 }
             }
         };
         
-        // Add event listener to each link
         links.forEach(link => {
             link.addEventListener('click', handleClick);
         });
         
-        // Cleanup
         return () => {
             links.forEach(link => {
                 link.removeEventListener('click', handleClick);
@@ -316,11 +304,9 @@ export default function Portfolio() {
         };
     }, [menuOpen]);
     
-    // Add these refs and the observer setup
     const skillsRef = useRef(null);
     const skillItemsRef = useRef([]);
 
-    // Add a ref for each video
     const videoRefs = useRef({
         web: null,
         interface: null,
@@ -328,29 +314,22 @@ export default function Portfolio() {
         solid: null
     });
 
-    // Update the skill section observer to manage videos
     useEffect(() => {
         if (typeof window !== 'undefined') {
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
-                        // Add animated class
                         entry.target.classList.add('skill-animated');
                         
-                        // Play the video if it exists
                         const skillName = entry.target.getAttribute('data-skill');
                         if (skillName && videoRefs.current[skillName]) {
                             try {
                                 const videoElement = videoRefs.current[skillName];
                                 if (videoElement) {
-                                    videoElement.muted = true; // Ensure muted for autoplay
-                                    videoElement.play().catch(error => {
-                                        console.log(`Video playback prevented: ${error}`);
-                                    });
+                                    videoElement.muted = true;
+                                    videoElement.play().catch(() => {});
                                 }
-                            } catch (err) {
-                                console.error("Error playing video:", err);
-                            }
+                            } catch (err) {}
                         }
                         
                         observer.unobserve(entry.target);
@@ -372,13 +351,11 @@ export default function Portfolio() {
         }
     }, []);
 
-    // Add additional refs for each section
     const heroRef = useRef(null);
     const projectsRef = useRef(null);
     const aboutRef = useRef(null);
     const contactRef = useRef(null);
 
-    // Add this effect for section animations
     useEffect(() => {
         const sectionRefs = [heroRef, projectsRef, skillsRef, aboutRef, contactRef];
         
@@ -406,107 +383,22 @@ export default function Portfolio() {
         };
     }, []);
     
-    // Update the menu effect to better handle section preservation
-    useEffect(() => {
-        if (menuOpen) {
-            // Store current scroll position and section
-            window.menuScrollY = window.scrollY;
-            menuPreviousSectionRef.current = activeSection;
-            
-            // Add menu-open class to body
-            document.body.classList.add('menu-open');
-            document.body.style.top = `-${window.menuScrollY}px`;
-            document.body.style.position = 'fixed';
-            document.body.style.width = '100%';
-            document.body.style.height = '100vh';
-            document.body.style.overflow = 'hidden';
-            
-            // Make menu visible
-            const menuOverlay = document.querySelector('.mobile-menu-overlay');
-            if (menuOverlay) {
-                menuOverlay.classList.add('open');
-                menuOverlay.style.opacity = '1';
-                menuOverlay.style.visibility = 'visible';
-            }
-        } else {
-            // Get the section we need to restore
-            const sectionToRestore = menuPreviousSectionRef.current;
-            
-            // Remove menu-open class from body
-            document.body.classList.remove('menu-open');
-            document.body.style.top = '';
-            document.body.style.position = '';
-            document.body.style.width = '';
-            document.body.style.height = '';
-            document.body.style.overflow = '';
-            
-            // Hide menu
-            const menuOverlay = document.querySelector('.mobile-menu-overlay');
-            if (menuOverlay) {
-                menuOverlay.classList.remove('open');
-                menuOverlay.style.opacity = '0';
-                menuOverlay.style.visibility = 'hidden';
-            }
-            
-            // Restore scroll position and section
-            if (window.menuScrollY !== undefined && sectionToRestore) {
-                // Prevent scroll handler from changing the active section
-                userClickedNavigationRef.current = true;
-                
-                // Set this section as the last clicked to further protect it
-                window.lastClickedSection = sectionToRestore;
-                
-                // Restore scroll position without animation
-                window.scrollTo({
-                    top: window.menuScrollY,
-                    behavior: 'auto' // Disable smooth scrolling
-                });
-                
-                // Force active section to be the original section
-                setActiveSection(sectionToRestore);
-                
-                // Clear any existing timeout
-                if (clickTimeoutIdRef.current) {
-                    clearTimeout(clickTimeoutIdRef.current);
-                }
-                
-                // Keep the block active longer to ensure no interference
-                clickTimeoutIdRef.current = setTimeout(() => {
-                    userClickedNavigationRef.current = false;
-                }, 2000);
-                
-                // Reset the stored scroll position
-                window.menuScrollY = undefined;
-            }
-        }
-    }, [menuOpen, activeSection]); // Keep activeSection as dependency
-    
-    // Create an improved closeMenu function that preserves section
-    const closeMenu = () => {
-        setMenuOpen(false);
-    };
-    
     return (
         <div className={`min-h-screen w-full`} style={{ 
             fontFamily: "'Space Grotesk', sans-serif",
             letterSpacing: "-0.02em"
         }}>
-            {/* HEADER SECTION */}
             <header className="header-main w-full fixed z-[99]">
-                {/* top line */}
                 <div className="top-line w-full h-[10px] fixed top-0 left-0" style={{
                     backgroundColor: darkMode ? "#000" : "white",
                     transition: "background-color 0.3s ease"
                 }}></div>
                 
-                {/* header container */}
                 <div className="header-container flex items-start w-full m-auto max-w-[1800px] z-[20]">
-                    {/* logo box */}
                     <div className="header-logo-box flex items-center justify-between w-auto pr-[1em] h-[80px] rounded-b-[30px] mr-[11px] relative z-[0] group" style={{
                         backgroundColor: darkMode ? "#000" : "white",
                         transition: "background-color 0.3s ease"
                     }}>
-                        {/* top right corner */}
                         <svg className="svg-corner corner-logo-box-two absolute top-0 -right-7.5 z-[99]" width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <g clipPath="url(#clip0_310_2)">
                                 <path d="M30 0H0V30C0 13.431 13.431 0 30 0Z" fill={darkMode ? "#000" : "white"} style={{ transition: "fill 0.3s ease" }}></path>
@@ -522,7 +414,6 @@ export default function Portfolio() {
                             </defs>
                         </svg>
 
-                        {/* bottom left corner */}
                         <svg className="svg-corner corner-logo-box-two absolute bottom-0 -rotate-90 z-[99]" width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <g clipPath="url(#clip0_310_2)">
                                 <path d="M30 0H0V30C0 13.431 13.431 0 30 0Z" fill={darkMode ? "#000" : "white"} style={{ transition: "fill 0.3s ease" }}></path>
@@ -537,7 +428,6 @@ export default function Portfolio() {
                                 </linearGradient>
                             </defs>
                         </svg>
-                        {/* bottom right corner inverse */}
                         <svg className="svg-corner corner-logo-box-two absolute ml-[2em] -bottom-7 rotate-0 z-[99]" width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <g clipPath="url(#clip0_310_2)">
                                 <path d="M30 0H0V30C0 13.431 13.431 0 30 0Z" fill={darkMode ? "#000" : "white"} style={{ transition: "fill 0.3s ease" }}></path>
@@ -553,7 +443,6 @@ export default function Portfolio() {
                             </defs>
                         </svg>
                         <a href="#" className="font-medium px-4 ml-[2em] relative overflow-hidden" style={{ width: "max-content" }}>
-                            {/* Background animated shapes */}
                             <div className="absolute inset-0 opacity-5 pointer-events-none overflow-hidden">
                                 <div className="absolute w-8 h-8 rounded-full bg-gradient-to-r from-[#6c72cb] to-[#cb69c1] top-1 left-1 animate-pulse"></div>
                                 <div className="absolute w-6 h-6 border border-[#6c72cb] rounded-sm -bottom-2 right-8 rotate-12 animate-spin-slow"></div>
@@ -595,13 +484,11 @@ export default function Portfolio() {
                             </div>
                         </a>
                         
-                        {/* Add subtle shine effect overlay */}
                         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-0 group-hover:opacity-10 translate-x-[-100%] group-hover:translate-x-[100%] transition-all duration-1000 ease-in-out pointer-events-none"></div>
                         
                         
 
                         
-                        {/* Mobile Menu Button (only visible on mobile) - Replace text with hamburger icon */}
                         <div 
                             className={`mobile-menu-btn flex md:hidden cursor-pointer w-[45px] h-[45px] mr-[0.6em] justify-center items-center relative z-[99] ${menuOpen ? 'menu-open' : ''}`} 
                             onClick={toggleMenu}
@@ -613,9 +500,8 @@ export default function Portfolio() {
                             </div>
                         </div>
                         
-                        {/* Full screen mobile menu overlay */}
                         <div className={`mobile-menu-overlay ${menuOpen ? 'open' : ''}`}>
-                            {/* Close button in top right */}
+                           
                             <button 
                                 className="mobile-menu-close" 
                                 onClick={closeMenu}
@@ -631,7 +517,6 @@ export default function Portfolio() {
                                     <span className="mobile-menu-title">Navigation</span>
                                 </div>
                                 
-                                {/* Add Home link to mobile navigation */}
                                 <nav className="mobile-menu-nav">
                                     <a href="#hero" className={`mobile-nav-link ${activeSection === 'hero' ? 'active' : ''}`} onClick={(e) => handleNavClick('hero', e)}>
                                         <span className="mobile-nav-number">00</span>
@@ -684,11 +569,9 @@ export default function Portfolio() {
                                     </div>
                             </div>
                         </div>
-                        </div>
+                    </div>
                     
-                    {/* Desktop Navigation - hidden on mobile */}
                     <div className="hidden md:block">
-                        {/* Add Home link to desktop navigation */}
                         <nav className="navigation relative h-[58px] rounded-[50px] py-0 px-[0.5em] flex items-center justify-evenly backdrop-blur-[10px] saturate-[200%] bg-[#ffffff80] border border-[rgba(209,213,219,.5)] shadow-[0_3px_20px_-5px_#00000026]">
                             <a href="#hero" className="text-base font-medium mx-[0.85em] leading-[1.15] transition-all duration-300 select-none relative group" onClick={(e) => handleNavClick('hero', e)}>
                                 <span className="relative z-10 text-black">Home</span>
@@ -718,15 +601,11 @@ export default function Portfolio() {
                 </div>
             </header>
 
-            {/* HERO SECTION */}
             <div className="hero mt-[10px] overflow-hidden" ref={heroRef} id="hero">
                 <div className="main-container w-full">
                     <div className="min-h-[630px] h-[85vh] overflow-hidden relative">
-                        {/* Content area with glass panels */}
                         <div className="w-full relative z-[3] flex flex-col lg:flex-row h-full justify-between">
-                            {/* Main content on left with iridescence background */}
                             <div className="w-fit lg:w-[70%] ml-[2em] h-full p-[2.5rem] md:p-[3.5rem] flex flex-col justify-between relative rounded-[20px] overflow-hidden">
-                                {/* Iridescence background with rounded corners */}
                                 <div className="absolute inset-0 overflow-hidden rounded-[20px]">
                                     <div className="absolute inset-0 z-[1]">
                                         <Iridescence
@@ -736,10 +615,8 @@ export default function Portfolio() {
                                         />
                                     </div>
                                     
-                                    {/* Subtle grain overlay */}
                                     <canvas ref={grainCanvasRef} className="grain absolute w-full h-full z-[2] opacity-20" width="904" height="895"></canvas>
                                     
-                                    {/* SVG Corner for top-left (intersection with logo) */}
                                     <svg className="svg-corner absolute top-0 left-0 z-[5] rotate-90" width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
                                         <g clipPath="url(#clip0_hero_corner_tl)">
                                             <path d="M30 0H0V30C0 13.431 13.431 0 30 0Z" fill={darkMode ? "#000" : "#fff"} style={{ transition: "fill 0.3s ease" }}></path>
@@ -755,7 +632,6 @@ export default function Portfolio() {
                                     
                                 </div>
                                 
-                                {/* Main content area */}
                                 <div className="mt-10 max-w-[600px] relative z-[3]">
                                     <h1 className="heading-text">
                                         <div className="overflow-hidden">
@@ -801,7 +677,6 @@ export default function Portfolio() {
                                 </div>
                             </div>
                             
-                            {/* Scroll down arrow for mobile - Will only be visible on mobile */}
                             <div className="scroll-down-arrow hidden sm:hidden">
                                 <a href="#projects" className="flex flex-col items-center">
                                     <span className="text-sm mb-1 opacity-70">Scroll</span>
@@ -813,21 +688,16 @@ export default function Portfolio() {
                                 </a>
                             </div>
                             
-                            {/* Right side - Stats and Blog (independent) */}
                             <div className="w-full lg:w-[27%] h-full flex flex-col gap-4 ml-[1em]">
-                                {/* Stats Component - Circular with 3D effect */}
                                 <div className="stats-card w-[310px] h-[450px] bg-black rounded-full flex flex-col items-center justify-center relative overflow-hidden shadow-xl group transition-all duration-500 hover:scale-[1.02]">
-                                    {/* Sophisticated background elements */}
                                     <div className="absolute inset-0 bg-gradient-to-br from-black to-gray-900"></div>
                                     <div className="absolute inset-0 opacity-30">
                                         <div className="absolute w-full h-full bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20"></div>
                                     </div>
                                     
-                                    {/* Glowing rim */}
                                     <div className="absolute inset-[2px] rounded-full border border-purple-500/10"></div>
                                     <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-transparent via-purple-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
                                     
-                                    {/* Animated particles */}
                                     <div className="absolute inset-0">
                                         <div className="absolute w-2 h-2 rounded-full bg-purple-300/30 animate-pulse-slow" style={{top: '20%', left: '30%'}}></div>
                                         <div className="absolute w-1 h-1 rounded-full bg-blue-300/30 animate-pulse-slow" style={{top: '70%', left: '60%', animationDelay: '1s'}}></div>
@@ -836,7 +706,6 @@ export default function Portfolio() {
                                     </div>
                                     
                                     
-                                    {/* Content with better typography */}
                                     <Swiper
                                         spaceBetween={30}
                                         slidesPerView={1}
@@ -902,12 +771,10 @@ export default function Portfolio() {
                                         ))}
                                     </Swiper>
 
-                                    {/* Custom pagination container */}
                                     <div className="stats-pagination absolute bottom-[1rem] flex justify-center w-full gap-2"></div>
                                     
                                 </div>
                                 
-                                {/* Blog Component - Card with modern design */}
                                 <div className="projects-card w-[320px] h-full relative transition-all duration-500 hover:scale-[1.02] rounded-3xl bottom-0 overflow-hidden">
                                 <Swiper
                                     spaceBetween={30}
@@ -932,19 +799,16 @@ export default function Portfolio() {
                                     {ProjectsOverView.map((project, index) => (
                                         <SwiperSlide key={index}>
                                             <div className="group h-full bg-white dark:bg-gray-900 rounded-3xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-500 transform hover:scale-[1.02] relative">
-                                                {/* Reduced header height to provide more room for content */}
                                                 <div className="h-[150px] bg-gradient-to-br from-[#6c5ce7] to-[#4834d4] relative overflow-hidden">
                                                     <div className="absolute inset-0">
                                                         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_-20%,#7c3aed,#4723d0)] mix-blend-multiply"></div>
                                                         <div className="absolute w-full h-full bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20"></div>
                                                         
-                                                        {/* Animated particles */}
                                                         <div className="absolute w-3 h-3 rounded-full bg-white/20 top-[20%] left-[15%] animate-pulse-slow"></div>
                                                         <div className="absolute w-2 h-2 rounded-full bg-white/30 top-[60%] left-[80%] animate-pulse-slow" style={{animationDelay: '0.8s'}}></div>
                                                         <div className="absolute w-4 h-4 rounded-full blur-sm bg-indigo-300/20 top-[30%] left-[50%] animate-float-slow"></div>
                                                     </div>
                                                     
-                                                    {/* Project icon/visual with optimized positioning */}
                                                     <div className="absolute inset-0 flex items-center justify-center opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all duration-700">
                                                         <div className="relative">
                                                             <div className="absolute inset-0 bg-purple-400/20 blur-xl rounded-full scale-150"></div>
@@ -971,9 +835,7 @@ export default function Portfolio() {
                                                     <div className="absolute top-0 left-0 right-0 h-20 bg-gradient-to-b from-black/20 to-transparent"></div>
                                                 </div>
                                                 
-                                                {/* Expanded content area with better spacing */}
                                                 <div className="h-[220px] p-6 overflow-hidden relative z-10 flex flex-col">
-                                                    {/* More compact tech stack display */}
                                                     <div className="flex flex-wrap gap-1 mb-3">
                                                         {project.technologies.slice(0, 4).map((tech, index) => (
                                                             <span 
@@ -990,12 +852,10 @@ export default function Portfolio() {
                                                         )}
                                                     </div>
                                                     
-                                                    {/* Larger project title with better spacing */}
                                                     <h3 className="text-2xl font-bold text-gray-900 dark:text-white group-hover:text-purple-700 dark:group-hover:text-purple-400 transition-colors duration-300 leading-tight mb-3">
                                                         {project.title}
                                                     </h3>
                                                     
-                                                    {/* Expanded description area (3 lines instead of 2) */}
                                                     <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-3 leading-relaxed mb-4 flex-grow">
                                                         {project.description}
                                                     </p>
@@ -1017,10 +877,8 @@ export default function Portfolio() {
 
 
 
-                {/* TECHNOLOGIES SECTION */}
                 <section className="technologies w-full m-auto max-w-[1160px] px-[40px] mb-20" id="technologies">
                     <div className="technologies-content mt-[4em] flex flex-col items-center w-full">
-                        {/* Enhanced header with subtle animation */}
                         <div className="section-header relative mb-16 flex flex-col items-center">
                             <span className="absolute -top-8 opacity-5 text-[5rem] font-bold tracking-wider blur-sm">
                                 TECH STACK
@@ -1030,7 +888,6 @@ export default function Portfolio() {
                             }}>Technologies & Tools</p>
                         </div>
                         
-                        {/* Programming Languages - Enhanced styling */}
                         <div className="tech-category w-full mb-16">
                             <div className="category-header mb-8 flex items-center">
                                 <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#4CAF50] to-[#8BC34A] flex items-center justify-center shadow-lg shadow-green-500/20 mr-4 rotate-3">
@@ -1050,7 +907,6 @@ export default function Portfolio() {
                                 </div>
                             </div>
                             
-                            {/* Preserved your existing grid with enhanced hover effects */}
                             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-8">
                                 <TechIcon 
                                     name="Java" 
@@ -1090,7 +946,6 @@ export default function Portfolio() {
                             </div>
                         </div>
                         
-                        {/* Libraries and Frameworks - Enhanced styling */}
                         <div className="tech-category w-full mb-16">
                             <div className="category-header mb-8 flex items-center">
                                 <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#9C27B0] to-[#673AB7] flex items-center justify-center shadow-lg shadow-purple-500/20 mr-4 -rotate-3">
@@ -1110,11 +965,9 @@ export default function Portfolio() {
                             </div>
                             
                             <div className="relative">
-                                {/* Subtle background decorative elements */}
                                 <div className="absolute -top-10 -left-10 w-40 h-40 rounded-full bg-gradient-to-br from-purple-500/5 to-transparent blur-3xl"></div>
                                 <div className="absolute -bottom-10 -right-10 w-40 h-40 rounded-full bg-gradient-to-br from-purple-500/5 to-transparent blur-3xl"></div>
                                 
-                                {/* Grid with your existing components */}
                                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-y-10 gap-x-6 relative z-10">
                                     <TechIcon 
                                         name="Spring" 
@@ -1193,7 +1046,6 @@ export default function Portfolio() {
                             </div>
                         </div>
                         
-                        {/* Databases - Enhanced styling */}
                         <div className="tech-category w-full mb-16">
                             <div className="category-header mb-8 flex items-center">
                                 <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#2196F3] to-[#03A9F4] flex items-center justify-center shadow-lg shadow-blue-500/20 mr-4 rotate-2">
@@ -1211,7 +1063,6 @@ export default function Portfolio() {
                                 </div>
                             </div>
                             
-                            {/* Enhanced wrapper with highlights */}
                             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-6">
                                     <TechIcon 
                                         name="PostgreSQL" 
@@ -1246,7 +1097,6 @@ export default function Portfolio() {
                                 </div>
                         </div>
                         
-                        {/* DevOps & Cloud - Enhanced styling */}
                         <div className="tech-category w-full mb-16">
                             <div className="category-header mb-8 flex items-center">
                                 <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#9C27B0] to-[#673AB7] flex items-center justify-center shadow-lg shadow-purple-500/20 mr-4 -rotate-2">
@@ -1339,7 +1189,6 @@ export default function Portfolio() {
                 </section>
 
 
-            {/* PROJECTS SECTION */}
             <section id="projects" className="projects w-full m-auto max-w-[1160px] px-[40px]" ref={projectsRef}>
                 <div className="projects-content mt-[6em] flex flex-col items-center w-full">
                     <div className="section-header relative mb-16 flex flex-col items-center">
@@ -1352,7 +1201,6 @@ export default function Portfolio() {
                     </div>
                     
                     <div className="project-cards min-h-[400px] w-full flex flex-col space-y-12">
-                        {/* MoroccoGuide-AI Project */}
                         <div className="transform-gpu translate-y-0 scale-100 opacity-100 transition-all duration-300">
                             <a target="_blank" href="https://moroccoguideai.vercel.app" className="card w-full h-[250px] border-b relative flex flex-col md:flex-row md:items-center group overflow-hidden transition-all duration-500 ease-in-out" style={{
                                 borderColor: darkMode ? "#F9F8F6" : "#000",
@@ -1360,10 +1208,8 @@ export default function Portfolio() {
                                 transition: "border-color 0.3s ease"
                             }}>
                                 
-                                {/* Animated background gradient */}
                                 <div className="absolute inset-0 bg-gradient-to-r from-[#6c72cb]/0 via-[#9c79e0]/0 to-[#cb69c1]/0 group-hover:from-[#6c72cb]/5 group-hover:via-[#9c79e0]/5 group-hover:to-[#cb69c1]/5 transition-all duration-500 ease-in-out opacity-0 group-hover:opacity-100"></div>
                                 
-                                {/* Animated line indicator */}
                                 <div className="absolute bottom-0 left-0 w-0 h-[3px] bg-gradient-to-r from-[#6c72cb] to-[#cb69c1] group-hover:w-full transition-all duration-700 ease-in-out"></div>
                                 
                                 <div className="card-text w-full h-full flex flex-col justify-between py-8 px-4 md:px-8 group-hover:translate-x-2 transition-all duration-500 ease-in-out">
@@ -1380,7 +1226,6 @@ export default function Portfolio() {
                                             </p>
                                         </div>  
                                         
-                                        {/* Status badge */}
                                         <div className="hidden md:block">
                                             <span className="text-xs px-3 py-1 bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300 rounded-full font-medium border border-green-200 dark:border-green-800/30">
                                                 Completed
@@ -1401,7 +1246,6 @@ export default function Portfolio() {
                                             </span>
                                         </div>
                                         
-                                        {/* Links with icons */}
                                         <div className="flex items-center gap-4">
                                             <a href="https://github.com/faiz-oussama/MoroccoGuide-AI" target="_blank" rel="noopener noreferrer" className="opacity-60 hover:opacity-100 transition-opacity duration-300">
                                                 <svg width="20" height="20" fill={darkMode ? "#F9F8F6" : "#000"} style={{ transition: "fill 0.3s ease" }} viewBox="0 0 24 24">
@@ -1938,7 +1782,7 @@ export default function Portfolio() {
                             >
                                 <source src="/videos/web_development.mp4" type="video/mp4" />
                                 Your browser does not support the video tag.
-                            </video>
+                    </video>
                 </div>
                 <p className="text-[clamp(1.5rem,7vw,7rem)] whitespace-nowrap font-semibold tracking-[-0.05em]"
                     style={{ color: darkMode ? "#F9F8F6" : "#000" }}>
