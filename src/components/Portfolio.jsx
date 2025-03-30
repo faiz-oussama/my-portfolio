@@ -320,12 +320,39 @@ export default function Portfolio() {
     const skillsRef = useRef(null);
     const skillItemsRef = useRef([]);
 
+    // Add a ref for each video
+    const videoRefs = useRef({
+        web: null,
+        interface: null,
+        creative: null,
+        solid: null
+    });
+
+    // Update the skill section observer to manage videos
     useEffect(() => {
         if (typeof window !== 'undefined') {
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
+                        // Add animated class
                         entry.target.classList.add('skill-animated');
+                        
+                        // Play the video if it exists
+                        const skillName = entry.target.getAttribute('data-skill');
+                        if (skillName && videoRefs.current[skillName]) {
+                            try {
+                                const videoElement = videoRefs.current[skillName];
+                                if (videoElement) {
+                                    videoElement.muted = true; // Ensure muted for autoplay
+                                    videoElement.play().catch(error => {
+                                        console.log(`Video playback prevented: ${error}`);
+                                    });
+                                }
+                            } catch (err) {
+                                console.error("Error playing video:", err);
+                            }
+                        }
+                        
                         observer.unobserve(entry.target);
                     }
                 });
@@ -344,7 +371,7 @@ export default function Portfolio() {
             };
         }
     }, []);
-    
+
     // Add additional refs for each section
     const heroRef = useRef(null);
     const projectsRef = useRef(null);
@@ -657,7 +684,7 @@ export default function Portfolio() {
                                     </div>
                             </div>
                         </div>
-                    </div>
+                        </div>
                     
                     {/* Desktop Navigation - hidden on mobile */}
                     <div className="hidden md:block">
@@ -1895,16 +1922,23 @@ export default function Portfolio() {
 
             <div className="flex flex-col gap-20 w-full">
                 {/* Web development */}
-                <div className="skill-item flex items-center justify-center">
+                <div className="skill-item flex items-center justify-center" data-skill="web">
                     <div className="skill-content flex items-center justify-center">
                 <p className="text-[clamp(1.5rem,7vw,7rem)] whitespace-nowrap font-semibold tracking-[-0.05em]"
                     style={{ color: darkMode ? "#F9F8F6" : "#000" }}>
                     Web
                 </p>
                         <div className="video-wrapper w-0 md:w-0 lg:w-0 mx-0 border-2 border-transparent rounded-[30px] overflow-hidden flex items-center justify-center transition-all duration-500">
-                            <video preload="auto" autoPlay loop playsInline className="w-full h-full object-cover rounded-[30px] transform scale-100 transition-transform duration-500">
-                            <source src="/videos/web_development.mp4" type="video/mp4" />
-                    </video>
+                            <video 
+                                ref={el => videoRefs.current.web = el}
+                                muted 
+                                playsInline 
+                                loop 
+                                className="w-full h-full object-cover rounded-[30px] transform scale-100 transition-transform duration-500"
+                            >
+                                <source src="/videos/web_development.mp4" type="video/mp4" />
+                                Your browser does not support the video tag.
+                            </video>
                 </div>
                 <p className="text-[clamp(1.5rem,7vw,7rem)] whitespace-nowrap font-semibold tracking-[-0.05em]"
                     style={{ color: darkMode ? "#F9F8F6" : "#000" }}>
@@ -1914,15 +1948,22 @@ export default function Portfolio() {
                 </div>
 
                 {/* Interface design */}
-                <div className="skill-item flex items-center justify-center">
+                <div className="skill-item flex items-center justify-center" data-skill="interface">
                     <div className="skill-content flex items-center justify-center">
                 <p className="text-[clamp(1.5rem,7vw,7rem)] whitespace-nowrap font-semibold tracking-[-0.05em]"
                     style={{ color: darkMode ? "#F9F8F6" : "#000" }}>
                     Interface
                 </p>
                         <div className="video-wrapper w-0 md:w-0 lg:w-0 mx-0 border-2 border-transparent rounded-[30px] overflow-hidden flex items-center justify-center transition-all duration-500">
-                    <video preload="auto" autoPlay loop playsInline poster="https://davidhaz.com/images/interface_design_placeholder.webp" className="w-full h-full object-cover rounded-[30px] transform scale-100 transition-transform duration-500">
+                    <video 
+                        ref={el => videoRefs.current.interface = el}
+                        muted 
+                        playsInline 
+                        loop 
+                        className="w-full h-full object-cover rounded-[30px] transform scale-100 transition-transform duration-500"
+                    >
                                 <source src="/videos/interface_design.mp4" type="video/mp4" />
+                                Your browser does not support the video tag.
                     </video>
                 </div>
                 <p className="text-[clamp(1.5rem,7vw,7rem)] whitespace-nowrap font-semibold tracking-[-0.05em]"
@@ -1933,15 +1974,22 @@ export default function Portfolio() {
                 </div>
 
                 {/* Creative coding */}
-                <div className="skill-item flex items-center justify-center">
+                <div className="skill-item flex items-center justify-center" data-skill="creative">
                     <div className="skill-content flex items-center justify-center">
                 <p className="text-[clamp(1.5rem,7vw,7rem)] whitespace-nowrap font-semibold tracking-[-0.05em]"
                     style={{ color: darkMode ? "#F9F8F6" : "#000" }}>
                     Creative
                 </p>
                         <div className="video-wrapper w-0 md:w-0 lg:w-0 mx-0 border-2 border-transparent rounded-[30px] overflow-hidden flex items-center justify-center transition-all duration-500">
-                    <video preload="none" autoPlay loop playsInline poster="https://davidhaz.com/images/creative_coding_placeholder.webp" className="w-full h-full object-cover rounded-[30px] transform scale-100 transition-transform duration-500">
+                    <video 
+                        ref={el => videoRefs.current.creative = el}
+                        muted 
+                        playsInline 
+                        loop 
+                        className="w-full h-full object-cover rounded-[30px] transform scale-100 transition-transform duration-500"
+                    >
                                 <source src="/videos/creative_coding.mp4" type="video/mp4" />
+                                Your browser does not support the video tag.
                     </video>
                 </div>
                 <p className="text-[clamp(1.5rem,7vw,7rem)] whitespace-nowrap font-semibold tracking-[-0.05em]"
@@ -1952,15 +2000,22 @@ export default function Portfolio() {
                 </div>
 
                 {/* Solid engineering */}
-                <div className="skill-item flex items-center justify-center">
+                <div className="skill-item flex items-center justify-center" data-skill="solid">
                     <div className="skill-content flex items-center justify-center">
                 <p className="text-[clamp(1.5rem,7vw,7rem)] whitespace-nowrap font-semibold tracking-[-0.05em]"
                     style={{ color: darkMode ? "#F9F8F6" : "#000" }}>
                     Solid
                 </p>
                         <div className="video-wrapper w-0 md:w-0 lg:w-0 mx-0 border-2 border-transparent rounded-[30px] overflow-hidden flex items-center justify-center transition-all duration-500">
-                    <video preload="auto" autoPlay loop playsInline poster="https://davidhaz.com/images/solid_engineering_placeholder.webp" className="w-full h-full object-cover rounded-[30px] transform scale-100 transition-transform duration-500">
+                    <video 
+                        ref={el => videoRefs.current.solid = el}
+                        muted 
+                        playsInline 
+                        loop 
+                        className="w-full h-full object-cover rounded-[30px] transform scale-100 transition-transform duration-500"
+                    >
                             <source src="/videos/solid_engineering.mp4" type="video/mp4" />
+                            Your browser does not support the video tag.
                     </video>
                 </div>
                 <p className="text-[clamp(1.5rem,7vw,7rem)] whitespace-nowrap font-semibold tracking-[-0.05em]"
