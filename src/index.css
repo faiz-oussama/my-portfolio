@@ -664,7 +664,7 @@
   .hero .slide-up.font-light.text-\[1\.2rem\] {
     margin-top: 0 !important;
     margin-bottom: 0.5rem !important;
-    color: white !important;
+    color: #000000 !important;
   }
   
   /* Reduce spacing between elements */
@@ -680,11 +680,11 @@
     margin-bottom: 0.5rem !important;
   }
   
-  /* Make the heading text white on the gradient */
+  /* Make the heading text black on mobile, not white */
   .hero .heading-text .slide-up,
   .hero .rotating-text-container span,
   .hero .max-w-\[500px\].mt-6 {
-    color: white !important;
+    color: #000000 !important;
   }
   
   /* Fix SVG corner position */
@@ -818,7 +818,7 @@
 }
 
 .menu-open .hamburger-icon .line-1 {
-  transform: translateY(9px) rotate(45deg);
+  opacity: 0;
 }
 
 .menu-open .hamburger-icon .line-2 {
@@ -826,7 +826,7 @@
 }
 
 .menu-open .hamburger-icon .line-3 {
-  transform: translateY(-9px) rotate(-45deg);
+  opacity: 0;
 }
 
 /* Fullscreen Menu Overlay */
