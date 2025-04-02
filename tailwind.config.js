@@ -1,5 +1,8 @@
 /** @type {import('tailwindcss').Config} */
 export default {
+  future: {
+    optimizeUniversalDefaults: false
+  },
   content: {
     relative: true,
     files: [
