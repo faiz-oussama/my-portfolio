@@ -7,7 +7,6 @@ import { Autoplay, EffectFade, Pagination } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import BlurText from '../assets/BlurText';
 import CountUp from '../assets/CountUp';
-import Iridescence from '../assets/iridescence';
 import RotatingText from '../assets/RotatingText';
 import TechIcon from '../assets/TechIcon';
 import { DarkModeContext } from "./DarkModeProvider";
@@ -631,13 +630,13 @@ export default function Portfolio() {
                                         </div>
                                         
                                         {/* Content */}
-                                        <div className="relative z-[5] h-full p-10 md:p-16 top-15 flex flex-col justify-center">
-                                            <div className="max-w-[600px]">
+                                        <div className="relative z-[5] h-full p-10 md:p-16 top-8 flex flex-col justify-center">
+                                            <div className="max-w-[800px]">
                                                 {/* Main headline with enhanced styling */}
-                                                <div className="overflow-hidden mb-4">
+                                                <div className="overflow-hidden mb-2">
                                                     <h1 className="font-medium text-[1.2rem] md:text-[1.6rem] text-white/80 mb-2 relative inline-flex items-center group">
-                                                        <span className="mr-2 opacity-70">Hello,</span>
-                                                        <span className="relative">
+                                                        <span className="ml-1 opacity-70">Hello,</span>
+                                                        <span className=" ml-2 relative">
                                                             I'm 
                                                             <span className="ml-2 relative inline-block">
                                                                 <span className="bg-gradient-to-r from-[#6c72cb] via-[#9c79e0] to-[#cb69c1] bg-clip-text text-transparent font-semibold">Oussama Faiz</span>
@@ -654,10 +653,11 @@ export default function Portfolio() {
                                                 </div>
                                                 
                                                 {/* Rotating profession */}
-                                                <div className="h-8 mb-8 w-full">
+                                                <div className="h-[3.5rem] sm:h-[4.5rem] md:h-[5.5rem]  w-full"> {/* Reduced heights */}
                                                     <RotatingText
                                                         texts={['Full-Stack Developer', 'Software Engineer', 'Problem Solver']}
-                                                        mainClassName="text-[3.5rem] sm:text-[4.5rem] md:text-[5.5rem] font-bold leading-[0.95] bg-gradient-to-r from-[#6c72cb] to-[#cb69c1] bg-clip-text text-transparent"
+                                                        mainClassName="text-[1.2rem] sm:text-[2rem] md:text-[3rem] font-bold leading-[0.95]"
+                                                        textClassName="bg-gradient-to-r from-[#6c72cb] via-[#9c79e0] to-[#cb69c1] inline-block text-transparent bg-clip-text"
                                                         splitLevelClassName="overflow-hidden"
                                                         initial={{ opacity: 0, y: 20 }}
                                                         animate={{ opacity: 1, y: 0 }}
@@ -679,7 +679,7 @@ export default function Portfolio() {
                                                 </div>
                                                 
                                                 {/* Call to action */}
-                                                <div className="mt-10 flex flex-wrap gap-5">
+                                                <div className="mt-5 flex flex-wrap gap-5">
                                                     <a href="#projects" className="group relative px-8 py-4 bg-white text-[#0f172a] font-medium rounded overflow-hidden">
                                                         <span className="relative z-10 flex items-center">
                                                             View Projects
@@ -1777,7 +1777,7 @@ export default function Portfolio() {
                 {/* Web development */}
                 <div className="skill-item flex items-center justify-center" data-skill="web">
                     <div className="skill-content flex items-center justify-center">
-                <p className="text-[clamp(1.5rem,7vw,7rem)] whitespace-nowrap font-semibold tracking-[-0.05em]"
+                <p className="text-[clamp(1.5rem,7vw,7rem)] whitespace-nowrap font-bold tracking-[-0.05em]"
                     style={{ color: darkMode ? "#F9F8F6" : "#000" }}>
                     Web
                 </p>

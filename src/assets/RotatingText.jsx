@@ -1,5 +1,6 @@
 "use client";
 
+import { AnimatePresence, motion } from "framer-motion";
 import {
   forwardRef,
   useCallback,
@@ -8,7 +9,6 @@ import {
   useMemo,
   useState,
 } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 
 function cn(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -33,6 +33,7 @@ const RotatingText = forwardRef((props, ref) => {
     mainClassName,
     splitLevelClassName,
     elementLevelClassName,
+    textClassName, // Add new prop for text styling
     ...rest
   } = props;
 
@@ -166,7 +167,8 @@ const RotatingText = forwardRef((props, ref) => {
       {...rest}
       layout
       transition={transition}
-      style={{ color: "#000000", ...rest.style }}
+      // Remove the hardcoded color style
+      style={{ ...rest.style }}
     >
       {/* Screen-reader only text */}
       <span className="sr-only">{texts[currentTextIndex]}</span>
@@ -200,7 +202,8 @@ const RotatingText = forwardRef((props, ref) => {
                         array.reduce((sum, word) => sum + word.characters.length, 0)
                       ),
                     }}
-                    className={cn("inline-block", elementLevelClassName)}
+                    // Apply the textClassName here
+                    className={cn("inline-block", elementLevelClassName, textClassName)}
                   >
                     {char}
                   </motion.span>
